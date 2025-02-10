@@ -1,2 +1,5 @@
 # Python compilation related files
 __pycache__
+
+# VS Code settings
+.vscode
