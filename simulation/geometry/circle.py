@@ -18,12 +18,12 @@ class Circle(Shape):
     def contains_point(self, point: Point) -> bool:
         return (point - self.center).squared_norm() <= self.radius**2.0
 
-    def collides_width(self, shape: Shape) -> bool:
+    def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
             return (shape.center - self.center).squared_norm() <= (self.radius + shape.radius)**2.0
         
         elif isinstance(shape, Shape):
-            return shape.collides_width(self)
+            return shape.collides_with(self)
         
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")

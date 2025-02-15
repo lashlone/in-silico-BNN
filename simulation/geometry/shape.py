@@ -41,7 +41,7 @@ class Shape:
         """Checks if a Point object lies inside this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def collides_width(self, shape: Shape) -> bool:
+    def collides_with(self, shape: Shape) -> bool:
         """Checks if another Shape object collides with this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     

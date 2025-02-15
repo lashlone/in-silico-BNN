@@ -65,30 +65,30 @@ class TestGeometry(TestCase):
 
     def test_circle_collides_with_circle(self):
         # Test when both shapes overlap
-        self.assertTrue(self.circle.collides_width(Circle(center=Point(-1.9, 2.5), radius=1.0)))
+        self.assertTrue(self.circle.collides_with(Circle(center=Point(-1.9, 2.5), radius=1.0)))
 
         # Test when only their perimeters overlap
-        self.assertTrue(self.circle.collides_width(Circle(center=Point(-4.0, 3.0), radius=3.0)))
+        self.assertTrue(self.circle.collides_with(Circle(center=Point(-4.0, 3.0), radius=3.0)))
 
         # Test when both shapes aren't colliding
-        self.assertFalse(self.circle.collides_width(Circle(center=Point(-2.0, 3.1), radius=1.0)))
+        self.assertFalse(self.circle.collides_with(Circle(center=Point(-2.0, 3.1), radius=1.0)))
 
     def test_rectangle_collides_with_circle(self):
         # Test when both shapes overlap
-        self.assertTrue(self.rectangle.collides_width(Circle(center=Point(0.5, 2.75), radius=1.0)))
+        self.assertTrue(self.rectangle.collides_with(Circle(center=Point(0.5, 2.75), radius=1.0)))
 
         # Test when only their perimeters overlap
-        self.assertTrue(self.rectangle.collides_width(Circle(center=Point(2.1, -2.0), radius=2.0)))
+        self.assertTrue(self.rectangle.collides_with(Circle(center=Point(2.1, -2.0), radius=2.0)))
 
         # Test when both shapes aren't colliding
-        self.assertFalse(self.rectangle.collides_width(Circle(center=Point(6.0, -1.8), radius=2.0)))
+        self.assertFalse(self.rectangle.collides_with(Circle(center=Point(6.0, -1.8), radius=2.0)))
 
     def test_triangle_collides_with_circle(self):
         # Test when both shapes overlap
-        self.assertTrue(self.rotated_triangle.collides_width(Circle(center=Point(1.05, -1.0), radius=1.5)))
+        self.assertTrue(self.rotated_triangle.collides_with(Circle(center=Point(1.05, -1.0), radius=1.5)))
 
         # Test when only their perimeters overlap
-        self.assertTrue(self.rotated_triangle.collides_width(Circle(center=Point(3.5, -4.0606), radius=1.0)))
+        self.assertTrue(self.rotated_triangle.collides_with(Circle(center=Point(3.5, -4.0606), radius=1.0)))
 
         # Test when both shapes aren't colliding
-        self.assertFalse(self.rotated_triangle.collides_width(Circle(center=Point(2.0, -4.0), radius=1.0)))
+        self.assertFalse(self.rotated_triangle.collides_with(Circle(center=Point(2.0, -4.0), radius=1.0)))

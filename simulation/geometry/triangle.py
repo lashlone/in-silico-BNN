@@ -36,7 +36,7 @@ class IsoscelesTriangle(Shape):
 
         return all([0.0 <= value <= 1.0 for value in local_barycentric_point])
     
-    def collides_width(self, shape: Shape) -> bool:
+    def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
             local_circle_center = self.translate_to_local(shape.center)
 

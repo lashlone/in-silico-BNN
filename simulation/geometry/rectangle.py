@@ -28,7 +28,7 @@ class Rectangle(Shape):
         return (-self.width/2.0 <= local_point.x <= self.width/2.0 
             and -self.height/2.0 <= local_point.y <= self.height/2.0) 
 
-    def collides_width(self, shape: Shape) -> bool:
+    def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
             local_circle_center = self.translate_to_local(shape.center)
 
