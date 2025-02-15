@@ -7,6 +7,8 @@ from math import atan, cos, degrees, radians, sin, sqrt
 
 class Point:
     """Defines a point as a 2D vector."""
+    x: float
+    y: float
 
     def __init__(self, x: float, y: float):
         """Defines a point as a 2D vector."""

@@ -5,12 +5,13 @@ The Shape class defined here should not directly be used as the shape parameter 
 """
 
 from __future__ import annotations
-from typing import List
 
 from simulation.geometry.point import Point
 
 class Shape:
     """Base class for all Shape objects."""
+    center: Point
+    orientation: float
 
     def __init__(self, center: Point, orientation: float):
         """Base class for all Shape objects."""
@@ -44,6 +45,6 @@ class Shape:
         """Checks if another Shape object collides with this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def get_perimeter_corners(self) -> List[Point]:
+    def get_perimeter_corners(self) -> list[Point]:
         """Returns a list of points that forms the corners of this shape's perimeter."""
         raise NotImplementedError("Subclasses must implement this method.")

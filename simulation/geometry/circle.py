@@ -8,6 +8,7 @@ from simulation.geometry.exceptions import CurvedLineError
 
 class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
+    radius: float
     
     def __init__(self, center: Point, radius: float):
         """Creates a circular shape based on its center and its radius."""

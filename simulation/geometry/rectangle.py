@@ -8,6 +8,8 @@ from simulation.geometry.circle import Circle
 
 class Rectangle(Shape):
     """Creates a rectangular shape based on its center, its width and its height."""
+    width: float
+    height: float
 
     def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0):
         """

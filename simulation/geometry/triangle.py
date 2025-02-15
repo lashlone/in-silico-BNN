@@ -3,7 +3,6 @@ Triangle class module. Inherits from the Shape class.
 """
 
 from math import atan, degrees, tan
-from typing import List
 
 from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
@@ -11,6 +10,9 @@ from simulation.geometry.circle import Circle
 
 class IsoscelesTriangle(Shape):
     """Creates a isosceles triangular shape based on its center, its base and its height."""
+    base: float
+    height: float
+    reference_vectors: list[Point]
 
     def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0):
         """
@@ -79,7 +81,7 @@ class IsoscelesTriangle(Shape):
         
         return [self.translate_to_global(corner) for corner in local_corners]
     
-    def get_barycentric_coordinates(self, point: Point) -> List[float]:
+    def get_barycentric_coordinates(self, point: Point) -> list[float]:
         """Returns the barycentric coordinates of the given point, using the triangle's three vertices as base."""
         v0, v1, v2 = self.reference_vectors
 
