@@ -74,7 +74,7 @@ class IsoscelesTriangle(Shape):
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_corners(self):
+    def get_perimeter_corners(self) -> list[Point]:
         local_corners = self.reference_vectors
         
         return [self.translate_to_global(corner) for corner in local_corners]

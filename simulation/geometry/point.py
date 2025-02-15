@@ -12,7 +12,7 @@ class Point():
         self.x = float(x)
         self.y = float(y)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         else:

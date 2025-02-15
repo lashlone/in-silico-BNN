@@ -19,11 +19,11 @@ class Shape():
         self.center = center
         self.orientation = float(orientation)
 
-    def move_center(self, translation: Point):
+    def move_center(self, translation: Point) -> None:
         """Moves the center of this shape by a given translation vector, represented by a Point object."""
         self.center += translation
 
-    def rotate(self, angle: float):
+    def rotate(self, angle: float) -> None:
         """Rotates this shape around its center by the given angle (in degrees)."""
         self.orientation += float(angle)
 

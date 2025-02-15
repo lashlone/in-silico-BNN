@@ -45,7 +45,7 @@ class Rectangle(Shape):
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_corners(self):
+    def get_perimeter_corners(self) -> list[Point]:
         local_corners = [Point(self.width/2.0, self.height/2.0), Point(-self.width/2.0, self.height/2.0),
                         Point(-self.width/2.0, -self.height/2.0), Point(self.width/2.0, -self.height/2.0)]
         
