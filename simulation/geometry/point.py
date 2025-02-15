@@ -2,9 +2,10 @@
 Point class module.
 """
 
+from __future__ import annotations
 from math import atan, cos, degrees, radians, sin, sqrt
 
-class Point():
+class Point:
     """Defines a point as a 2D vector."""
 
     def __init__(self, x: float, y: float):
@@ -18,10 +19,10 @@ class Point():
         else:
             return False
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> Point:
         return not self.__eq__(other)
 
-    def __add__(self, other):
+    def __add__(self, other) -> Point:
         if isinstance(other, Point):
             x = self.x + other.x
             y = self.y + other.y
@@ -29,7 +30,7 @@ class Point():
         else:
             raise TypeError(f"unsupported operand type(s) for +: '{type(self).__name__}' and '{type(other).__name__}'")
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> Point:
         if isinstance(other, Point):
             x = self.x - other.x
             y = self.y - other.y
@@ -37,17 +38,17 @@ class Point():
         else:
             raise TypeError(f"unsupported operand type(s) for -: '{type(self).__name__}' and '{type(other).__name__}'")
         
-    def __rmul__(self, other: int | float):
+    def __rmul__(self, other: int | float) -> Point:
         return Point(float(other)*self.x, float(other)*self.y)
     
     def __repr__(self) -> str:
         return f"[{self.x:.4f}, {self.y:.4f}]"
     
-    def round(self, digit_number: int):
+    def round(self, digit_number: int) -> Point:
         """Rounds each coordinates of the point to the given number of digits."""
         return Point(round(self.x, digit_number), round(self.y, digit_number))
     
-    def rotate(self, angle: float):
+    def rotate(self, angle: float) -> Point:
         """Rotates a point around the origin by the specified angle (in degrees)."""
         angle = radians(float(angle))
         return Point(self.x*cos(angle) - self.y*sin(angle), self.x*sin(angle) + self.y*cos(angle))

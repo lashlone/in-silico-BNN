@@ -4,11 +4,12 @@ Base class module.
 The Shape class defined here should not directly be used as the shape parameter of Element objects and will make the simulation fail.  
 """
 
+from __future__ import annotations
 from typing import List
 
 from simulation.geometry.point import Point
 
-class Shape():
+class Shape:
     """Base class for all Shape objects."""
 
     def __init__(self, center: Point, orientation: float):
@@ -39,7 +40,7 @@ class Shape():
         """Checks if a Point object lies inside this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def collides_width(self, shape) -> bool:
+    def collides_width(self, shape: Shape) -> bool:
         """Checks if another Shape object collides with this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
