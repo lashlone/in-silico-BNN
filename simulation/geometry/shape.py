@@ -21,6 +21,14 @@ class Shape:
         self.center = center
         self.orientation = float(orientation)
 
+    def __eq__(self, other):
+        """Checks if two Shapes are equal."""
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+            dict
+
     def move_center(self, translation: Point) -> None:
         """Moves the center of this shape by a given translation vector, represented by a Point object."""
         self.center += translation
