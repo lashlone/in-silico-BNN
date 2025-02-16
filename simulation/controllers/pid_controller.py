@@ -27,10 +27,6 @@ class PIDController(Controller):
         self.cumulative_error = 0.0
         self.last_error = None
 
-    def update(self, controlled_element: Element):
-        if not isinstance(controlled_element, Element):
-            raise TypeError(f"unsupported parameter type(s) for reference: '{type(controlled_element).__name__}'")
-
 class VerticalPositionPIDController(PIDController):
     """Creates a VerticalPIDController object that controls the element's vertical position based on a reference element."""
 
