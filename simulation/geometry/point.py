@@ -32,6 +32,9 @@ class Point:
         else:
             raise TypeError(f"unsupported operand type(s) for +: '{type(self).__name__}' and '{type(other).__name__}'")
 
+    def __neg__(self) -> Point:
+        return Point(-self.x, -self.y)
+    
     def __sub__(self, other) -> Point:
         if isinstance(other, Point):
             x = self.x - other.x
