@@ -4,6 +4,8 @@ Base class module.
 The Controller class defined here should not directly be used as a controller of an element and will make the simulation fail.  
 """
 
+from __future__ import annotations
+
 from simulation.elements.base_element import Element
 
 class Controller:
@@ -11,6 +13,13 @@ class Controller:
 
     def __init__(self):
         """Base class for all Controller objects."""
+
+    def __eq__(self, other: Controller):
+        """Checks if two Controller are equal."""
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
         
     def update(self, controlled_element: Element) -> None:
         """Updates controlled element's state."""
