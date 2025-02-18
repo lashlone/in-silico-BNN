@@ -5,6 +5,8 @@ Point class module.
 from __future__ import annotations
 from math import atan, cos, degrees, radians, sin, sqrt
 
+TOLERANCE = 1e-8
+
 class Point:
     """Defines a point as a 2D vector."""
     x: float
@@ -17,7 +19,7 @@ class Point:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
+            return (self - other).squared_norm() <= TOLERANCE ** 2.0
         else:
             return False
 
