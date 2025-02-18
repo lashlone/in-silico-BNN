@@ -21,6 +21,10 @@ class Controller:
         else:
             return False
         
+    def __repr__(self) -> str:
+        """Object's representation for testing purposes."""
+        return f"{self.__class__.__name__}({self.__dict__})"
+        
     def update(self, controlled_element: Element) -> None:
         """Updates controlled element's state."""
         if not isinstance(controlled_element, Element):

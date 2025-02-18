@@ -47,6 +47,11 @@ class Point:
         return Point(float(other)*self.x, float(other)*self.y)
     
     def __repr__(self) -> str:
+        """Object's representation for testing purposes."""
+        return f"{self.__class__.__name__}({self.__dict__})"
+    
+    def __str__(self) -> str:
+        """Object's clean representation."""
         return f"[{self.x:.4f}, {self.y:.4f}]"
     
     def round(self, digit_number: int) -> Point:
