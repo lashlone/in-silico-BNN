@@ -3,4 +3,4 @@ Exception classes module.
 """
 
 class CurvedLineError(Exception):
-    pass
+    """Corners are not defined on curved lines."""
