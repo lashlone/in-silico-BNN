@@ -12,7 +12,7 @@ class Controller:
     def __init__(self):
         """Base class for all Controller objects."""
         
-    def update(self, controlled_element: Element):
+    def update(self, controlled_element: Element) -> None:
         """Updates controlled element's state."""
         if not isinstance(controlled_element, Element):
             raise TypeError(f"unsupported parameter type(s) for reference: '{type(controlled_element).__name__}'")

@@ -30,7 +30,7 @@ class PIDController(Controller):
 class VerticalPositionPIDController(PIDController):
     """Creates a VerticalPIDController object that controls the element's vertical position based on a reference element."""
 
-    def update(self, controlled_element):
+    def update(self, controlled_element) -> None:
         super().update(controlled_element)
 
         # Computes the error between the reference and the signal

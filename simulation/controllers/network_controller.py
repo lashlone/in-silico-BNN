@@ -50,7 +50,7 @@ class ConstantSpeedNetworkController(NetworkController):
         self.reference_speed = reference_speed
         self.signal_threshold = float(signal_threshold)
 
-    def update(self, controlled_element: Element):
+    def update(self, controlled_element: Element) -> None:
         super().update(controlled_element)
 
         # Gets the signal for moving foward or moving backward
