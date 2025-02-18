@@ -21,7 +21,7 @@ class Shape:
         self.center = center
         self.orientation = float(orientation)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Checks if two Shapes are equal."""
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__

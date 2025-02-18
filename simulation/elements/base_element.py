@@ -29,7 +29,7 @@ class Element:
         self.speed = speed
         self.acceleration = acceleration
 
-    def __eq__(self, other: Element):
+    def __eq__(self, other: Element) -> bool:
         """Checks if two Elements are equal."""
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
