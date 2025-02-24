@@ -18,6 +18,7 @@ class Point:
         self.y = float(y)
 
     def __eq__(self, other) -> bool:
+        """Two points are defined equal if they are relatively close one from another."""
         if isinstance(other, self.__class__):
             return (self - other).squared_norm() <= TOLERANCE ** 2.0
         else:
@@ -27,6 +28,7 @@ class Point:
         return not self.__eq__(other)
 
     def __add__(self, other) -> Point:
+        """Follows the definition of addition between two vectors."""
         if isinstance(other, Point):
             x = self.x + other.x
             y = self.y + other.y
@@ -35,9 +37,11 @@ class Point:
             raise TypeError(f"unsupported operand type(s) for +: '{type(self).__name__}' and '{type(other).__name__}'")
 
     def __neg__(self) -> Point:
+        """Follows the definition of opposite for a vector."""
         return Point(-self.x, -self.y)
     
     def __sub__(self, other) -> Point:
+        """Follows the definition of subtraction between two vectors."""
         if isinstance(other, Point):
             x = self.x - other.x
             y = self.y - other.y
@@ -45,7 +49,17 @@ class Point:
         else:
             raise TypeError(f"unsupported operand type(s) for -: '{type(self).__name__}' and '{type(other).__name__}'")
         
+    def __mul__(self, other: Point) -> float:
+        """Follows the definition of the dot product between two vectors."""
+        if isinstance(other, Point):
+            return self.x * other.x + self.y * other.y
+        elif isinstance(other, (int, float)):
+            raise TypeError(f"unsupported operand type(s) for *: '{type(self).__name__}' and '{type(other).__name__}'\nSwitch the position of the Point and scalar objects for scalar multiplication.")
+        else:
+            raise TypeError(f"unsupported operand type(s) for *: '{type(self).__name__}' and '{type(other).__name__}'")
+
     def __rmul__(self, other: int | float) -> Point:
+        """Defined by the scalar multiplication of a vector."""
         return Point(float(other)*self.x, float(other)*self.y)
     
     def __repr__(self) -> str:
@@ -91,3 +105,17 @@ class Point:
             angle += 360.0
 
         return angle
+    
+    def projection(self, other: Point) -> Point:
+        """Returns the projection of this Point object on another vector."""
+        if isinstance(other, Point):
+            return ((self * other)/other.squared_norm()) * other
+        else:
+            raise TypeError(f"unsupported parameter type(s) for other: '{type(other).__name__}'")
+        
+    def reflection(self, other: Point) -> Point:
+        """Returns the reflection of this Point object over the axis defined by another vector."""
+        if isinstance(other, Point):
+            return self - 2.0 * self.projection(other)
+        else:
+            raise TypeError(f"unsupported parameter type(s) for other: '{type(other).__name__}'") 
