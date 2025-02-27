@@ -2,6 +2,8 @@
 Rectangle class module. Inherits from the Shape class.
 """
 
+import random
+
 from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
 from simulation.geometry.circle import Circle
@@ -52,3 +54,9 @@ class Rectangle(Shape):
                         Point(-self.width/2.0, -self.height/2.0), Point(self.width/2.0, -self.height/2.0)]
         
         return [self.translate_to_global(corner) for corner in local_corners]
+    
+    def get_random_point(self) -> Point:
+        x = random.uniform(-self.width/2.0, self.width/2.0)
+        y = random.uniform(-self.height/2.0, self.height/2.0)
+
+        return self.translate_to_global(Point(x, y))

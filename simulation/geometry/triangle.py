@@ -2,6 +2,7 @@
 Triangle class module. Inherits from the Shape class.
 """
 
+import numpy as np
 from math import atan, degrees, tan
 
 from simulation.geometry.shape import Shape
@@ -80,6 +81,15 @@ class IsoscelesTriangle(Shape):
         local_corners = self.reference_vectors
         
         return [self.translate_to_global(corner) for corner in local_corners]
+    
+    def get_random_point(self) -> Point:
+        v0, v1, v2 = self.reference_vectors
+
+        lambdas = np.random.default_rng().uniform(size=3)
+        lambdas = lambdas/sum(lambdas)
+        
+        return self.translate_to_global(lambdas[0]*v0 + lambdas[1]*v1 + lambdas[2]*v2)
+
     
     def get_barycentric_coordinates(self, point: Point) -> list[float]:
         """Returns the barycentric coordinates of the given point, using the triangle's three vertices as base."""
