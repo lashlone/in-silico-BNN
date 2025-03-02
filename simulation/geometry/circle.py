@@ -2,7 +2,6 @@
 Circle class module. Inherits from the Shape class.
 """
 
-import random
 from math import pi, cos, sin
 
 from simulation.geometry.shape import Shape
@@ -35,8 +34,8 @@ class Circle(Shape):
         raise CurvedLineError("The corners of curved polygons are not defined")
     
     def get_random_point(self) -> Point:
-        radius = random.uniform(0.0, self.radius)
-        orientation = random.uniform(0.0, 2.0*pi)
+        radius = self.generator.uniform(0.0, self.radius)
+        orientation = self.generator.uniform(0.0, 2.0*pi)
 
         return self.translate_to_global(Point(radius*cos(orientation), radius*sin(orientation)))
 

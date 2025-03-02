@@ -6,12 +6,15 @@ The Shape class defined here should not directly be used as the shape parameter 
 
 from __future__ import annotations
 
+import numpy as np
+
 from simulation.geometry.point import Point
 
 class Shape:
     """Base class for all Shape objects."""
     center: Point
     orientation: float
+    generator: np.random.Generator
 
     def __init__(self, center: Point, orientation: float):
         """Base class for all Shape objects."""
@@ -20,6 +23,8 @@ class Shape:
         
         self.center = center
         self.orientation = float(orientation)
+
+        self.generator = np.random.default_rng()
 
     def __eq__(self, other) -> bool:
         """Checks if two Shapes are equal."""
