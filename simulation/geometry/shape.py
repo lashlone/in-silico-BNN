@@ -51,16 +51,16 @@ class Shape:
         """Rotates this shape around its center by the given angle (in degrees)."""
         self.orientation += float(angle)
 
-    def translate_to_local(self, point: Point) -> Point:
+    def translate_to_local(self, global_point: Point) -> Point:
         """Translates a point from the simulation's global coordinates to the shape's local coordinates."""
-        return (point - self.center).rotate(-self.orientation)
+        return (global_point - self.center).rotate(-self.orientation)
 
-    def translate_to_global(self, point: Point) -> Point:
+    def translate_to_global(self, local_point: Point) -> Point:
         """Translates a point from the shape's local coordinates to the simulation's global coordinates."""
-        return point.rotate(self.orientation) + self.center
+        return local_point.rotate(self.orientation) + self.center
     
-    def contains_point(self, point: Point) -> bool:
-        """Checks if a Point object lies inside this shape."""
+    def contains_point(self, global_point: Point) -> bool:
+        """Checks if a global Point object lies inside this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
     def collides_with(self, shape: Shape) -> bool:
@@ -74,3 +74,12 @@ class Shape:
     def get_random_point(self) -> Point:
         """Return a random Point object contained within this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
+    
+    def get_closest_point(self, local_point: Point) -> Point:
+        """Returns the closest point on the shape's perimeter from another local point."""
+        raise NotImplementedError("Subclasses must implement this method.")
+    
+    def get_edge_normal_vector(self, local_point: Point) -> Point:
+        """Returns the normal vector of the edge that the given local point is on."""
+        raise NotImplementedError("Subclasses must implement this method")
+    

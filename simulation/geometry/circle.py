@@ -7,7 +7,7 @@ from math import pi, cos, sin
 
 from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
-from simulation.geometry.exceptions import CurvedLineError
+from simulation.geometry.exceptions import CurvedEdgeError
 
 class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
@@ -22,8 +22,8 @@ class Circle(Shape):
         super().__init__(center, 0.0, generator)
         self.radius = float(radius)
 
-    def contains_point(self, point: Point) -> bool:
-        return (point - self.center).squared_norm() <= self.radius**2.0
+    def contains_point(self, global_point: Point) -> bool:
+        return (global_point - self.center).squared_norm() <= self.radius**2.0
 
     def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
@@ -36,7 +36,7 @@ class Circle(Shape):
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
     def get_perimeter_corners(self):
-        raise CurvedLineError("The corners of curved polygons are not defined")
+        raise CurvedEdgeError("The corners of curved polygons are not defined")
     
     def get_random_point(self) -> Point:
         radius = self.generator.uniform(0.0, self.radius)
@@ -44,5 +44,10 @@ class Circle(Shape):
 
         return self.translate_to_global(Point(radius*cos(orientation), radius*sin(orientation)))
 
+    def get_closest_point(self, local_point: Point) -> Point:
+        return (self.radius/local_point.norm()) * local_point
+    
+    def get_edge_normal_vector(self, local_point: Point) -> Point:
+        return local_point.unit_vector()
 
         
