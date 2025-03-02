@@ -2,6 +2,8 @@
 Rectangle class module. Inherits from the Shape class.
 """
 
+import numpy as np
+
 from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
 from simulation.geometry.circle import Circle
@@ -11,14 +13,16 @@ class Rectangle(Shape):
     width: float
     height: float
 
-    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0):
+    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None):
         """
         Creates a rectangular shape based on its center, its width and its height.
+            - center: the center's coordinates of the rectangle.
             - width: size of the rectangle on the x-axis.
             - height: size of the rectangle on the y-axis.
-            - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis. 
+            - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis.
+            - generator (optional): Generator object to use when generating random values.
         """
-        super().__init__(center, orientation)
+        super().__init__(center, orientation, generator)
         self.width = float(width)
         self.height = float(height)
 

@@ -16,15 +16,21 @@ class Shape:
     orientation: float
     generator: np.random.Generator
 
-    def __init__(self, center: Point, orientation: float):
+    def __init__(self, center: Point, orientation: float, generator: None | np.random.Generator):
         """Base class for all Shape objects."""
         if not isinstance(center, Point):
             raise TypeError(f"unsupported parameter type(s) for center: '{type(center).__name__}'")
+        if generator is not None:
+            if not isinstance(generator, np.random.Generator):
+                raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
         
         self.center = center
         self.orientation = float(orientation)
-
-        self.generator = np.random.default_rng()
+        
+        if generator is not None:
+            self.generator = generator
+        else:
+            self.generator = np.random.default_rng()
 
     def __eq__(self, other) -> bool:
         """Checks if two Shapes are equal."""

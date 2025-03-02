@@ -2,6 +2,7 @@
 Circle class module. Inherits from the Shape class.
 """
 
+import numpy as np
 from math import pi, cos, sin
 
 from simulation.geometry.shape import Shape
@@ -12,9 +13,13 @@ class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
     radius: float
     
-    def __init__(self, center: Point, radius: float):
-        """Creates a circular shape based on its center and its radius."""
-        super().__init__(center, 0.0)
+    def __init__(self, center: Point, radius: float, generator: None | np.random.Generator = None):
+        """Creates a circular shape based on its center and its radius.
+            - center: the center's coordinates of the circle.
+            - radius: radius of the circle object.
+            - generator (optional): Generator object to use when generating random values.
+        """
+        super().__init__(center, 0.0, generator)
         self.radius = float(radius)
 
     def contains_point(self, point: Point) -> bool:
