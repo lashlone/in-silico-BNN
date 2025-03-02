@@ -7,6 +7,7 @@ from simulation.elements.paddle import Paddle
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
+import numpy as np
 from math import sqrt
 
 class TestController(Controller):
@@ -22,9 +23,12 @@ class TestController(Controller):
         
 
 class TestElements(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.generator = np.random.default_rng()
     
     def test_paddle(self):
-        paddle_shape = Circle(center=Point(0.0, 0.0), radius=1.0)
+        paddle_shape = Circle(center=Point(0.0, 0.0), radius=1.0, generator=TestElements.generator)
         paddle_controller = TestController()
         paddle = Paddle(shape=paddle_shape, controller=paddle_controller, y_range=(0.0, 4.0))
 
@@ -40,14 +44,14 @@ class TestElements(TestCase):
 
 
     def test_ball(self):
-        ball_shape = Circle(center=Point(0.0, 0.0), radius=1.0)
+        ball_shape = Circle(center=Point(0.0, 0.0), radius=1.0, generator=TestElements.generator)
         ball = Ball(shape=ball_shape, speed=Point(1.0, 1.0), acceleration=Point(-1.0, 0.0), speed_range=(0.0, sqrt(2.0)))
 
         expected_positions = [Point(1.0, 1.0), Point(1.0, 2.0), Point(0.0, 3.0)]
         expected_speeds = [Point(0.0, 1.0), Point(-1.0, 1.0), Point(-1.2649110640, 0.6324555320)]
 
         for position, speed in zip(expected_positions, expected_speeds):
-            expected_shape = Circle(center=position, radius=1.0)
+            expected_shape = Circle(center=position, radius=1.0, generator=TestElements.generator)
             expected_ball = Ball(shape=expected_shape, speed=speed, acceleration=Point(-1.0, 0.0), speed_range=(0.0, sqrt(2.0)))
 
             ball.update()
