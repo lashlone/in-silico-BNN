@@ -106,6 +106,10 @@ class Point:
 
         return angle
     
+    def unit_vector(self) -> Point:
+        """Returns the unit vector of this Point object."""
+        return (1/self.norm()) * self
+
     def projection(self, other: Point) -> Point:
         """Returns the projection of this Point object on another vector."""
         if isinstance(other, Point):
