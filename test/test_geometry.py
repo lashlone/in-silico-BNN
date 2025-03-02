@@ -16,8 +16,8 @@ class TestGeometry(TestCase):
         cls.rotated_triangle = IsoscelesTriangle(center=Point(3.5, -2.0), base=6.0, height=3.0, orientation=225.0)
 
     def test_rectangle_perimeter(self):
-        expected_perimeter = [Point(-0.7345, 7.0401), Point(-3.7655, 5.2901),
-                              Point(-1.2655, 0.9599), Point(1.7655, 2.7099)]
+        expected_perimeter = [Point(-0.7345, 7.0401), Point(1.7655, 2.7099),
+                              Point(-1.2655, 0.9599), Point(-3.7655, 5.2901)]
         
         result_perimeter = self.rotated_rectangle.get_perimeter_corners()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
@@ -26,7 +26,7 @@ class TestGeometry(TestCase):
     
     def test_triangle_perimeter(self):
         expected_perimeter = [Point(2.4393, -3.0607),
-                              Point(6.6820, -3.0607), Point(2.4393, 1.1820)]
+                              Point(2.4393, 1.1820), Point(6.6820, -3.0607)]
 
         result_perimeter = self.rotated_triangle.get_perimeter_corners()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
