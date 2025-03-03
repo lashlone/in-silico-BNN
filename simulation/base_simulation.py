@@ -37,6 +37,7 @@ class Simulation():
         self.env_history.append((repr(element.shape.center) for element in self.elements))
 
     def step(self) -> None:
+        """Updates the states of all of the simulation's elements based on its previous states, then resolves elements interaction."""
         for element in self.elements:
             element.update()
         self.env_history.append((repr(element.shape.center) for element in self.elements))

@@ -84,11 +84,12 @@ class Pong(Simulation):
 
     def step(self) -> None:
         super().step()
-        self.resolve_ball_collisions()
+        self.check_ball_collisions()
         self.network.propagate_signal(self.ball_sensory_signal_translator.generate_sensory_signal())
         self.network.optimize_connections()
         
-    def resolve_ball_collisions(self) -> None:
+    def check_ball_collisions(self) -> None:
+        """Check for ball collisions and resolves its effects, either locally or by calling another method."""
         # Detects collision with top and bottom walls
         if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.ball.shape.center.y >= self.height + self.ball.shape.radius):
             reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
@@ -106,12 +107,14 @@ class Pong(Simulation):
             # self.network.reward_function()
 
     def regenerate_ball(self) -> None:
+        """Regenerate the ball object at a random position within the simulation ball generation area."""
         ball_position = self.ball_generation_area.get_random_point()
         ball_speed_orientation = self.generator.uniform(low=self.ball_min_orientation, high=self.ball_max_orientation)
         ball_speed = Point(self.ball_reference_speed, 0.0).rotate(ball_speed_orientation)
         self.ball.set_state(position=ball_position, speed=ball_speed)
 
     def resolve_collision_with_paddle(self, paddle: Paddle):
+        """Resolves the effect of the collision between the ball and a paddle object"""
         closest_point = paddle.shape.get_closest_point(paddle.shape.translate_to_local(self.ball.shape.center))
         collided_edge_normal_vector = paddle.shape.get_edge_normal_vector(closest_point).rotate(paddle.shape.orientation)
 
@@ -159,6 +162,7 @@ class PongSignalTranslator:
         self.simulation = None
 
     def set_simulation(self, simulation: Pong) -> PongSignalTranslator:
+        """Setter for the simulation attribute."""
         if not isinstance(simulation, Pong):
             raise TypeError(f"unsupported parameter type(s) for simulation: '{type(simulation).__name__}'")
         self.simulation = simulation
@@ -166,7 +170,8 @@ class PongSignalTranslator:
 
         return self
     
-    def generate_sensory_signal(self):
+    def generate_sensory_signal(self) -> dict[str, list[float]]:
+        """Generate the sensory signal from the ball for the Pong simulation."""
         if self.simulation is None:
             raise AttributeError("simulation attribute must be initialize before using this function")
         
@@ -175,10 +180,10 @@ class PongSignalTranslator:
 
         if self.timer >= signal_period:
             triggered_region = min(self.simulation.ball.shape.center.y // self.topographic_region_length, self.nb_topographic_regions - 1)
-            sensory_signal = [1 if i == triggered_region else 0 for i in range(self.nb_topographic_regions) for _ in range(self.neurons_by_regions)]
+            sensory_signal = [1.0 if i == triggered_region else 0.0 for i in range(self.nb_topographic_regions) for _ in range(self.neurons_by_regions)]
             self.timer = 0
         else:
-            sensory_signal = [0] * self.neurons_by_regions * self.nb_topographic_regions
+            sensory_signal = [0.0] * self.neurons_by_regions * self.nb_topographic_regions
             self.timer += 1
 
         return {self.region_name: sensory_signal}
