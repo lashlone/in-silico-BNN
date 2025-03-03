@@ -2,6 +2,8 @@
 Ball class module. Inherits from the Element class. Used to model a moving ball in the simulation.
 """
 
+from __future__ import annotations
+
 from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
@@ -40,7 +42,7 @@ class Ball(Element):
             elif current_speed > max_speed:
                 self.speed = (max_speed/current_speed) * self.speed
 
-    def set_state(self, position = None, speed = None, acceleration = None) -> None:
+    def set_state(self, position = None, speed = None, acceleration = None) -> Ball:
         if speed is not None:
             if self.speed_range is not None:
                 min_speed, max_speed = self.speed_range
@@ -48,7 +50,7 @@ class Ball(Element):
                 if not (min_speed < speed.norm() < max_speed):
                     raise ValueError("given speed value's norm is out of bound")
     
-        super().set_state(position, speed, acceleration)
+        return super().set_state(position, speed, acceleration)
 
     def update(self) -> None:
         super().update()

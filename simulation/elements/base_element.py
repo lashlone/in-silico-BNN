@@ -40,7 +40,7 @@ class Element:
         """Object's representation for testing purposes."""
         return f"{self.__class__.__name__}({self.__dict__})"
 
-    def set_state(self, position: Point | None = None, speed: Point | None = None, acceleration: Point | None = None) -> None:
+    def set_state(self, position: Point | None = None, speed: Point | None = None, acceleration: Point | None = None) -> Element:
         """Set the element's state to the given values. If a parameter is set to None, the element keeps its previous value for this parameter."""
         if position is not None:
             if not isinstance(position, Point):
@@ -59,6 +59,8 @@ class Element:
                 raise TypeError(f"unsupported parameter type(s) for acceleration: '{type(acceleration).__name__}'")
             else:
                 self.acceleration = acceleration
+
+        return self
 
     def update(self) -> None:
         """Updates the element's state based on its current state."""

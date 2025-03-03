@@ -42,14 +42,14 @@ class Paddle(Element):
         elif current_y > max_y:
             self.shape.move_center(Point(0.0, max_y - current_y))
     
-    def set_state(self, position = None, speed = None, acceleration = None) -> None:
+    def set_state(self, position = None, speed = None, acceleration = None) -> Paddle:
         if position is not None:
             min_y, max_y = self.y_range
             
             if not (min_y < position.y < max_y):
                 raise ValueError("given position y value is out of bound")
     
-        super().set_state(position, speed, acceleration)
+        return super().set_state(position, speed, acceleration)
 
     def update(self):
         self.controller.update(self)
