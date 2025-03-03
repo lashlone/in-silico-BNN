@@ -5,9 +5,10 @@ Circle class module. Inherits from the Shape class.
 import numpy as np
 from math import pi, cos, sin
 
-from simulation.geometry.shape import Shape
+from simulation.geometry.constants import TOLERANCE
+from simulation.geometry.exceptions import CurvedEdgeError, EdgeError
 from simulation.geometry.point import Point
-from simulation.geometry.exceptions import CurvedEdgeError
+from simulation.geometry.shape import Shape
 
 class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
@@ -23,11 +24,11 @@ class Circle(Shape):
         self.radius = float(radius)
 
     def contains_point(self, global_point: Point) -> bool:
-        return (global_point - self.center).squared_norm() <= self.radius**2.0
+        return (global_point - self.center).squared_norm() <= (self.radius + TOLERANCE) **2.0
 
     def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
-            return (shape.center - self.center).squared_norm() <= (self.radius + shape.radius)**2.0
+            return (shape.center - self.center).squared_norm() <= (self.radius + shape.radius + 2.0*TOLERANCE)**2.0
         
         elif isinstance(shape, Shape):
             return shape.collides_with(self)
@@ -48,6 +49,9 @@ class Circle(Shape):
         return (self.radius/local_point.norm()) * local_point
     
     def get_edge_normal_vector(self, local_point: Point) -> Point:
-        return local_point.unit_vector()
+        if local_point.squared_norm() - self.radius ** 2.0 <= TOLERANCE ** 2.0:
+            return local_point.unit_vector()
+        else:
+            raise EdgeError("Given point is not on this shape's perimeter. It won't be associated to any normal vector.")
 
         

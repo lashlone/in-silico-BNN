@@ -5,10 +5,11 @@ Triangle class module. Inherits from the Shape class.
 import numpy as np
 from math import atan, degrees, tan
 
+from simulation.geometry.circle import Circle
+from simulation.geometry.constants import TOLERANCE
 from simulation.geometry.exceptions import EdgeError
 from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
-from simulation.geometry.circle import Circle
 
 SHAPE_EDGE_COUNT = 3
 
@@ -125,8 +126,10 @@ class IsoscelesTriangle(Shape):
         return closest_point
     
     def get_edge_normal_vector(self, local_point):
-        for normal_vector, reference_vector in zip(self.edge_normal_vectors, self.edge_reference_vectors):
-            if local_point.projection(normal_vector) == reference_vector:
-                return normal_vector
+        for edge, normal_vector, reference_vector in zip(self.edges, self.edge_normal_vectors, self.edge_reference_vectors):
+            if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
+            and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
+                if local_point.projection(normal_vector) == reference_vector:
+                    return normal_vector
         else:
             raise EdgeError("Given point is not on this shape's perimeter. It can't be associated to any edges.")

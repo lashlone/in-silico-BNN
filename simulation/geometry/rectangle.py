@@ -4,10 +4,11 @@ Rectangle class module. Inherits from the Shape class.
 
 import numpy as np
 
-from simulation.geometry.exceptions import EdgeError
-from simulation.geometry.shape import Shape
-from simulation.geometry.point import Point
 from simulation.geometry.circle import Circle
+from simulation.geometry.constants import TOLERANCE
+from simulation.geometry.exceptions import EdgeError
+from simulation.geometry.point import Point
+from simulation.geometry.shape import Shape
 
 SHAPE_EDGE_COUNT = 4
 
@@ -37,14 +38,14 @@ class Rectangle(Shape):
                                  Point(-self.width/2.0, -self.height/2.0), Point(-self.width/2.0, self.height/2.0)]
 
         self.edges = [(self.perimeter_points[i-1], self.perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
-        self.edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector() for point1, point2 in self.edges]
-        self.edge_reference_vectors = [perimeter_point.projection(normal_vector) for perimeter_point, normal_vector in zip(self.perimeter_points, self.edge_normal_vectors)]
+        self.edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector().round(8) for point1, point2 in self.edges]
+        self.edge_reference_vectors = [perimeter_point.projection(normal_vector).round(8) for perimeter_point, normal_vector in zip(self.perimeter_points, self.edge_normal_vectors)]
 
     def contains_point(self, point: Point) -> bool:
         local_point = self.translate_to_local(point)
 
-        return (-self.width/2.0 <= local_point.x <= self.width/2.0 
-            and -self.height/2.0 <= local_point.y <= self.height/2.0) 
+        return (-(self.width/2.0 + TOLERANCE) <= local_point.x <= self.width/2.0 + TOLERANCE 
+            and -(self.height/2.0 + TOLERANCE) <= local_point.y <= self.height/2.0 + TOLERANCE) 
 
     def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
@@ -76,8 +77,10 @@ class Rectangle(Shape):
         return Point(closest_x, closest_y)
     
     def get_edge_normal_vector(self, local_point):
-        for normal_vector, reference_vector in zip(self.edge_normal_vectors, self.edge_reference_vectors):
-            if local_point.projection(normal_vector) == reference_vector:
-                return normal_vector
+        for edge, normal_vector, reference_vector in zip(self.edges, self.edge_normal_vectors, self.edge_reference_vectors):
+            if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
+            and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
+                if local_point.projection(normal_vector) == reference_vector:
+                    return normal_vector
         else:
             raise EdgeError("Given point is not on this shape's perimeter. It can't be associated to any edges.")
