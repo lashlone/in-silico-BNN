@@ -5,7 +5,7 @@ Point class module.
 from __future__ import annotations
 from math import atan, cos, degrees, radians, sin, sqrt
 
-TOLERANCE = 1e-8
+from simulation.geometry.constants import TOLERANCE
 
 class Point:
     """Defines a point as a 2D vector."""
