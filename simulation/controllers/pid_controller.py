@@ -11,8 +11,8 @@ class PIDController(Controller):
     kp: float
     ki: float
     kd: float
-    cumulative_error: float
-    last_error: float | None
+    _cumulative_error: float
+    _last_error: float | None
 
     def __init__(self, kp: float, ki: float, kd: float, reference: Element):
         """Base class for PIDController object."""
@@ -24,8 +24,8 @@ class PIDController(Controller):
         self.kd = float(kd)
         self.reference = reference
 
-        self.cumulative_error = 0.0
-        self.last_error = None
+        self._cumulative_error = 0.0
+        self._last_error = None
 
 class VerticalPositionPIDController(PIDController):
     """Creates a VerticalPIDController object that controls the element's vertical position based on a reference element."""
@@ -37,17 +37,17 @@ class VerticalPositionPIDController(PIDController):
         error = self.reference.shape.center.y - controlled_element.shape.center.y
 
         # Handles the integration part of the controller
-        self.cumulative_error += error
+        self._cumulative_error += error
 
         # Handles the differential part of the controller
-        if self.last_error is None:
+        if self._last_error is None:
             differential_error = 0.0
         else:
-            differential_error = error - self.last_error
-        self.last_error = error
+            differential_error = error - self._last_error
+        self._last_error = error
 
         # Computes the correction and applies it to the controlled element
-        correction = self.kp*error + self.ki*self.cumulative_error + self.kd*differential_error
+        correction = self.kp*error + self.ki*self._cumulative_error + self.kd*differential_error
         controlled_element.shape.move_center(Point(0.0, correction))
     
 

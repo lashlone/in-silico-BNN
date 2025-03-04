@@ -17,10 +17,10 @@ class IsoscelesTriangle(Shape):
     """Creates a isosceles triangular shape based on its center, its base and its height."""
     base: float
     height: float
-    perimeter_points: list[Point]
-    edges: list[tuple[Point, Point]]
-    edge_normal_vectors: list[Point]
-    edge_reference_vectors: list[Point]
+    _perimeter_points: list[Point]
+    _edges: list[tuple[Point, Point]]
+    _edge_normal_vectors: list[Point]
+    _edge_reference_vectors: list[Point]
 
     def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None):
         """
@@ -35,17 +35,17 @@ class IsoscelesTriangle(Shape):
         self.base = float(base)
         self.height = float(height)
         
-        self.perimeter_points = [Point(self.height/2.0, 0.0),
+        self._perimeter_points = [Point(self.height/2.0, 0.0),
                                   Point(-self.height/2.0, -self.base/2.0),
                                   Point(-self.height/2.0, self.base/2.0)]
         
-        self.edges = [(self.perimeter_points[i-1], self.perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
-        self.edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector() for point1, point2 in self.edges]
-        self.edge_reference_vectors = [perimeter_point.projection(normal_vector) for perimeter_point, normal_vector in zip(self.perimeter_points, self.edge_normal_vectors)]
+        self._edges = [(self._perimeter_points[i-1], self._perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
+        self._edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector() for point1, point2 in self._edges]
+        self._edge_reference_vectors = [perimeter_point.projection(normal_vector) for perimeter_point, normal_vector in zip(self._perimeter_points, self._edge_normal_vectors)]
 
     def get_barycentric_coordinates(self, local_point: Point) -> list[float]:
         """Returns the barycentric coordinates of the given point, using the triangle's three vertices as base."""
-        v0, v1, v2 = self.perimeter_points
+        v0, v1, v2 = self._perimeter_points
 
         # Defines a linear system with the condition on the sum of the lambdas. See references for more explications.
         a1 = v1 - v0
@@ -85,11 +85,11 @@ class IsoscelesTriangle(Shape):
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
     def get_perimeter_corners(self) -> list[Point]:
-        return [self.translate_to_global(point) for point in self.perimeter_points]
+        return [self.translate_to_global(point) for point in self._perimeter_points]
     
     def get_random_point(self) -> Point:
         # Generate a random point in the triangle by using the barycentric coordinate system.
-        v0, v1, v2 = self.perimeter_points
+        v0, v1, v2 = self._perimeter_points
 
         lambdas = self.generator.uniform(size=3)
         lambdas = lambdas/sum(lambdas)
@@ -107,11 +107,11 @@ class IsoscelesTriangle(Shape):
         # Chooses which edge to consider based on the center's orientation
         bisected_angle_degrees = degrees(bisected_angle_rad)
         if center_orientation <= bisected_angle_degrees + 90.0:
-            v0, v1 = self.perimeter_points[2], self.perimeter_points[0]
+            v0, v1 = self._perimeter_points[2], self._perimeter_points[0]
         elif center_orientation >= 270.0 - bisected_angle_degrees:
-            v0, v1 = self.perimeter_points[0], self.perimeter_points[1]
+            v0, v1 = self._perimeter_points[0], self._perimeter_points[1]
         else:
-            v0, v1 = self.perimeter_points[1], self.perimeter_points[2]
+            v0, v1 = self._perimeter_points[1], self._perimeter_points[2]
 
         # Computes the projection of the vector v0 → local_circle center on v0 → v1.
         point_vector = local_point - v0
@@ -126,7 +126,7 @@ class IsoscelesTriangle(Shape):
         return closest_point
     
     def get_edge_normal_vector(self, local_point):
-        for edge, normal_vector, reference_vector in zip(self.edges, self.edge_normal_vectors, self.edge_reference_vectors):
+        for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
                 if local_point.projection(normal_vector) == reference_vector:

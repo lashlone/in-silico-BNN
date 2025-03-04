@@ -16,10 +16,10 @@ class Rectangle(Shape):
     """Creates a rectangular shape based on its center, its width and its height."""
     width: float
     height: float
-    perimeter_points: list[Point]
-    edges: list[tuple[Point, Point]]
-    edge_normal_vectors: list[Point]
-    edge_reference_vectors: list[Point]
+    _perimeter_points: list[Point]
+    _edges: list[tuple[Point, Point]]
+    _edge_normal_vectors: list[Point]
+    _edge_reference_vectors: list[Point]
 
     def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None):
         """
@@ -34,12 +34,12 @@ class Rectangle(Shape):
         self.width = float(width)
         self.height = float(height)
 
-        self.perimeter_points = [Point(self.width/2.0, self.height/2.0), Point(self.width/2.0, -self.height/2.0),
+        self._perimeter_points = [Point(self.width/2.0, self.height/2.0), Point(self.width/2.0, -self.height/2.0),
                                  Point(-self.width/2.0, -self.height/2.0), Point(-self.width/2.0, self.height/2.0)]
 
-        self.edges = [(self.perimeter_points[i-1], self.perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
-        self.edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector().round(8) for point1, point2 in self.edges]
-        self.edge_reference_vectors = [perimeter_point.projection(normal_vector).round(8) for perimeter_point, normal_vector in zip(self.perimeter_points, self.edge_normal_vectors)]
+        self._edges = [(self._perimeter_points[i-1], self._perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
+        self._edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector().round(8) for point1, point2 in self._edges]
+        self._edge_reference_vectors = [perimeter_point.projection(normal_vector).round(8) for perimeter_point, normal_vector in zip(self._perimeter_points, self._edge_normal_vectors)]
 
     def contains_point(self, point: Point) -> bool:
         local_point = self.translate_to_local(point)
@@ -63,7 +63,7 @@ class Rectangle(Shape):
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
     def get_perimeter_corners(self) -> list[Point]:        
-        return [self.translate_to_global(point) for point in self.perimeter_points]
+        return [self.translate_to_global(point) for point in self._perimeter_points]
     
     def get_random_point(self) -> Point:
         x = self.generator.uniform(-self.width/2.0, self.width/2.0)
@@ -77,7 +77,7 @@ class Rectangle(Shape):
         return Point(closest_x, closest_y)
     
     def get_edge_normal_vector(self, local_point):
-        for edge, normal_vector, reference_vector in zip(self.edges, self.edge_normal_vectors, self.edge_reference_vectors):
+        for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
                 if local_point.projection(normal_vector) == reference_vector:
