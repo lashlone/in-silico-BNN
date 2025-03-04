@@ -43,7 +43,7 @@ class Element:
     def __str__(self) -> str:
         """Object's string representation, excluding hidden attributes."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
-        return f"{self.__class__.__name__}({filtered_attributes})"
+        return f"{self.__class__.__name__}({', '.join(f'{key}={value}' for key, value in filtered_attributes.items())})"
 
     def set_state(self, position: Point | None = None, speed: Point | None = None, acceleration: Point | None = None) -> Element:
         """Set the element's state to the given values. If a parameter is set to None, the element keeps its previous value for this parameter."""

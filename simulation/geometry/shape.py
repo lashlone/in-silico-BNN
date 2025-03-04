@@ -46,7 +46,7 @@ class Shape:
     def __str__(self) -> str:
         """Object's string representation, excluding hidden attributes."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
-        return f"{self.__class__.__name__}({filtered_attributes})"
+        return f"{self.__class__.__name__}({', '.join(f'{key}={value}' for key, value in filtered_attributes.items())})"
 
     def move_center(self, translation: Point) -> None:
         """Moves the center of this shape by a given translation vector, represented by a Point object."""
