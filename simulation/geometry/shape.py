@@ -7,22 +7,31 @@ The Shape class defined here should not directly be used as the shape parameter 
 from __future__ import annotations
 
 import numpy as np
+import re
 
 from simulation.geometry.point import Point
+
+HEX_PATTERN = r"^#([A-Fa-f0-9]{6})$"
 
 class Shape:
     """Base class for all Shape objects."""
     center: Point
     orientation: float
     generator: np.random.Generator
+    fill: str
+    stroke: str
 
-    def __init__(self, center: Point, orientation: float, generator: None | np.random.Generator):
+    def __init__(self, center: Point, orientation: float, generator: None | np.random.Generator, fill: str, stroke: str):
         """Base class for all Shape objects."""
         if not isinstance(center, Point):
             raise TypeError(f"unsupported parameter type(s) for center: '{type(center).__name__}'")
         if generator is not None:
             if not isinstance(generator, np.random.Generator):
                 raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
+        if not bool(re.match(HEX_PATTERN, str(fill))):
+            raise ValueError(f"Unsupported hexadecimal pattern for fill ({fill}).")
+        if not bool(re.match(HEX_PATTERN, str(stroke))):
+            raise ValueError(f"Unsupported hexadecimal pattern for stroke ({stroke}).")
         
         self.center = center
         self.orientation = float(orientation)
@@ -31,6 +40,9 @@ class Shape:
             self.generator = generator
         else:
             self.generator = np.random.default_rng()
+
+        self.fill = str(fill)
+        self.stroke = str(stroke)
 
     def __eq__(self, other) -> bool:
         """Checks if two Shapes are equal."""

@@ -21,7 +21,7 @@ class Rectangle(Shape):
     _edge_normal_vectors: list[Point]
     _edge_reference_vectors: list[Point]
 
-    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None):
+    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
         """
         Creates a rectangular shape based on its center, its width and its height.
             - center: the center's coordinates of the rectangle.
@@ -29,8 +29,10 @@ class Rectangle(Shape):
             - height: size of the rectangle on the y-axis.
             - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis.
             - generator (optional): Generator object to use when generating random values.
+            - fill (optional): Shape background color, in hexadecimal (default white).
+            - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, generator)
+        super().__init__(center, orientation, generator, fill, stroke)
         self.width = float(width)
         self.height = float(height)
 

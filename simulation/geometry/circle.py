@@ -14,14 +14,16 @@ class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
     radius: float
     
-    def __init__(self, center: Point, radius: float, generator: None | np.random.Generator = None, orientation: float = 0.0):
+    def __init__(self, center: Point, radius: float, generator: None | np.random.Generator = None, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
         """Creates a circular shape based on its center and its radius.
             - center: the center's coordinates of the circle.
             - radius: radius of the circle object.
             - generator (optional): Generator object to use when generating random values.
             - orientation (optional): circle's orientation. This parameter is simply inherited from the shape class but is not used.
+            - fill (optional): Shape background color, in hexadecimal (default white).
+            - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, generator)
+        super().__init__(center, orientation, generator, fill, stroke)
         self.radius = float(radius)
 
     def contains_point(self, global_point: Point) -> bool:
