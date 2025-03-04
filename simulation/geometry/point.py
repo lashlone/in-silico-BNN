@@ -67,6 +67,11 @@ class Point:
         return f"{self.__class__.__name__}({self.__dict__})"
     
     def __str__(self) -> str:
+        """Object's string representation, excluding hidden attributes."""
+        filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
+        return f"{self.__class__.__name__}({filtered_attributes})"
+
+    def pprint(self) -> str:
         """Object's clean representation."""
         return f"[{self.x:.4f}, {self.y:.4f}]"
     
