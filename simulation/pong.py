@@ -21,9 +21,9 @@ class Pong(Simulation):
     network: Network
     ball_generation_area: Shape
     ball_sensory_signal_translator: PongSignalTranslator
-    ball_reference_speed: float
     ball_min_orientation: float
     ball_max_orientation: float
+    _ball_reference_speed: float
 
     def __init__(
                     self, 
@@ -78,7 +78,7 @@ class Pong(Simulation):
         self.network = network
         self.ball_generation_area = ball_generation_area
         self.ball_sensory_signal_translator = ball_sensory_signal_translator.set_simulation(self)
-        self.ball_reference_speed = self.ball.speed.norm()
+        self._ball_reference_speed = self.ball.speed.norm()
         self.ball_min_orientation = ball_min_orientation
         self.ball_max_orientation = ball_max_orientation
 
@@ -110,7 +110,7 @@ class Pong(Simulation):
         """Regenerate the ball object at a random position within the simulation ball generation area."""
         ball_position = self.ball_generation_area.get_random_point()
         ball_speed_orientation = self.generator.uniform(low=self.ball_min_orientation, high=self.ball_max_orientation)
-        ball_speed = Point(self.ball_reference_speed, 0.0).rotate(ball_speed_orientation)
+        ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
         self.ball.set_state(position=ball_position, speed=ball_speed)
 
     def resolve_collision_with_paddle(self, paddle: Paddle):
