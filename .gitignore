@@ -9,3 +9,6 @@ cspell.json
 
 # Pseudocode files
 _pseudocode
+
+# Result directory
+results
