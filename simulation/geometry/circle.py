@@ -2,8 +2,8 @@
 Circle class module. Inherits from the Shape class.
 """
 
-import numpy as np
 from math import pi, cos, sin
+from numpy.random import Generator
 
 from simulation.geometry.constants import TOLERANCE
 from simulation.geometry.exceptions import CurvedEdgeError, EdgeError
@@ -14,7 +14,7 @@ class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
     radius: float
     
-    def __init__(self, center: Point, radius: float, generator: None | np.random.Generator = None, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, radius: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
         """Creates a circular shape based on its center and its radius.
             - center: the center's coordinates of the circle.
             - radius: radius of the circle object.
@@ -23,7 +23,7 @@ class Circle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, generator, fill, stroke)
+        super().__init__(center, orientation, fill, stroke)
         self.radius = float(radius)
 
         if not self.radius > 0.0:
@@ -45,9 +45,12 @@ class Circle(Shape):
     def get_perimeter_corners(self):
         raise CurvedEdgeError("The corners of curved polygons are not defined")
     
-    def get_random_point(self) -> Point:
-        radius = self.generator.uniform(0.0, self.radius)
-        orientation = self.generator.uniform(0.0, 2.0*pi)
+    def get_random_point(self, generator: Generator) -> Point:
+        if not isinstance(generator, Generator):
+            raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
+        
+        radius = generator.uniform(0.0, self.radius)
+        orientation = generator.uniform(0.0, 2.0*pi)
 
         return self.translate_to_global(Point(radius*cos(orientation), radius*sin(orientation)))
 

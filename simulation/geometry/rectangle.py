@@ -2,7 +2,7 @@
 Rectangle class module. Inherits from the Shape class.
 """
 
-import numpy as np
+from numpy.random import Generator
 
 from simulation.geometry.circle import Circle
 from simulation.geometry.constants import TOLERANCE
@@ -21,7 +21,7 @@ class Rectangle(Shape):
     _edge_normal_vectors: list[Point]
     _edge_reference_vectors: list[Point]
 
-    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
         """
         Creates a rectangular shape based on its center, its width and its height.
             - center: the center's coordinates of the rectangle.
@@ -32,7 +32,7 @@ class Rectangle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, generator, fill, stroke)
+        super().__init__(center, orientation, fill, stroke)
         self.width = float(width)
         self.height = float(height)
 
@@ -72,9 +72,12 @@ class Rectangle(Shape):
     def get_perimeter_corners(self) -> list[Point]:        
         return [self.translate_to_global(point) for point in self._perimeter_points]
     
-    def get_random_point(self) -> Point:
-        x = self.generator.uniform(-self.width/2.0, self.width/2.0)
-        y = self.generator.uniform(-self.height/2.0, self.height/2.0)
+    def get_random_point(self, generator: Generator) -> Point:
+        if not isinstance(generator, Generator):
+            raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
+        
+        x = generator.uniform(-self.width/2.0, self.width/2.0)
+        y = generator.uniform(-self.height/2.0, self.height/2.0)
 
         return self.translate_to_global(Point(x, y))
     

@@ -6,7 +6,7 @@ The Shape class defined here should not directly be used as the shape parameter 
 
 from __future__ import annotations
 
-import numpy as np
+from numpy.random import Generator
 import re
 
 from simulation.geometry.point import Point
@@ -17,17 +17,13 @@ class Shape:
     """Base class for all Shape objects."""
     center: Point
     orientation: float
-    generator: np.random.Generator
     fill: str
     stroke: str
 
-    def __init__(self, center: Point, orientation: float, generator: None | np.random.Generator, fill: str, stroke: str):
+    def __init__(self, center: Point, orientation: float, fill: str, stroke: str):
         """Base class for all Shape objects."""
         if not isinstance(center, Point):
             raise TypeError(f"unsupported parameter type(s) for center: '{type(center).__name__}'")
-        if generator is not None:
-            if not isinstance(generator, np.random.Generator):
-                raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
         if not bool(re.match(HEX_PATTERN, str(fill))):
             raise ValueError(f"Unsupported hexadecimal pattern for fill ({fill}).")
         if not bool(re.match(HEX_PATTERN, str(stroke))):
@@ -35,12 +31,6 @@ class Shape:
         
         self.center = center
         self.orientation = float(orientation)
-        
-        if generator is not None:
-            self.generator = generator
-        else:
-            self.generator = np.random.default_rng()
-
         self.fill = str(fill)
         self.stroke = str(stroke)
 
@@ -88,7 +78,7 @@ class Shape:
         """Returns a list of points that forms the corners of this shape's perimeter."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def get_random_point(self) -> Point:
+    def get_random_point(self, genenrator: Generator) -> Point:
         """Return a random Point object contained within this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     

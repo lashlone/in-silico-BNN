@@ -2,8 +2,8 @@
 Triangle class module. Inherits from the Shape class.
 """
 
-import numpy as np
 from math import atan, degrees, tan
+from numpy.random import Generator
 
 from simulation.geometry.circle import Circle
 from simulation.geometry.constants import TOLERANCE
@@ -22,7 +22,7 @@ class IsoscelesTriangle(Shape):
     _edge_normal_vectors: list[Point]
     _edge_reference_vectors: list[Point]
 
-    def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, generator: None | np.random.Generator = None, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
         """
         Creates a isosceles triangular shape based on its center, its base and its height.
             - center: the center's coordinates of the rectangle boxing the triangle object.
@@ -33,7 +33,7 @@ class IsoscelesTriangle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, generator, fill, stroke)
+        super().__init__(center, orientation, fill, stroke)
         self.base = float(base)
         self.height = float(height)
         
@@ -94,11 +94,14 @@ class IsoscelesTriangle(Shape):
     def get_perimeter_corners(self) -> list[Point]:
         return [self.translate_to_global(point) for point in self._perimeter_points]
     
-    def get_random_point(self) -> Point:
+    def get_random_point(self, generator: Generator) -> Point:
+        if not isinstance(generator, Generator):
+            raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
+        
         # Generate a random point in the triangle by using the barycentric coordinate system.
         v0, v1, v2 = self._perimeter_points
 
-        lambdas = self.generator.uniform(size=3)
+        lambdas = generator.uniform(size=3)
         lambdas = lambdas/sum(lambdas)
         
         return self.translate_to_global(lambdas[0]*v0 + lambdas[1]*v1 + lambdas[2]*v2)

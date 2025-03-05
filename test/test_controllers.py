@@ -9,8 +9,6 @@ from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
-import numpy as np
-
 class TestNetwork(Network):
     """Simplified Network class for testing purposes."""
     motor_signals: list[tuple[float]] = [(0.0, 0.0), (1.0, 0.3), (0.8, 1.0), (0.2, 0.7)]
@@ -34,20 +32,17 @@ class TestNetwork(Network):
         return self.motor_signals[self.motor_signal_cycle[self.signal_cycle_index]]
     
 class TestPIDControllers(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.generator = np.random.default_rng()
     
     def test_vertical_PID_controller(self):
-        reference_element_shape = Circle(center=Point(5.0, 0.0), radius=1.0, generator=TestPIDControllers.generator)
+        reference_element_shape = Circle(center=Point(5.0, 0.0), radius=1.0)
         reference_element = Element(shape=reference_element_shape, speed=Point(0.0, 1.0))
 
-        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0, generator=TestPIDControllers.generator)
+        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0)
         controlled_element = Element(shape=controlled_element_shape)
 
         pid_controller = VerticalPID(kp=0.5, ki=1.0, kd=-0.5, reference=reference_element)
 
-        expected_element_shape = Circle(center=Point(0.0, -1.0), radius=1.0, generator=TestPIDControllers.generator)
+        expected_element_shape = Circle(center=Point(0.0, -1.0), radius=1.0)
         expected_element = Element(shape=expected_element_shape)
 
         pid_controller.update(controlled_element)
@@ -55,16 +50,13 @@ class TestPIDControllers(TestCase):
 
         reference_element.update()
         
-        expected_element_shape = Circle(center=Point(0.0, -2.0), radius=1.0, generator=TestPIDControllers.generator)
+        expected_element_shape = Circle(center=Point(0.0, -2.0), radius=1.0)
         expected_element = Element(shape=expected_element_shape)
 
         pid_controller.update(controlled_element)
         self.assertEqual(expected_element, controlled_element)
 
 class TestNetworkController(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.generator = np.random.default_rng()
 
     def setUp(self):
         self.network = TestNetwork()
@@ -77,7 +69,7 @@ class TestNetworkController(TestCase):
             CSNetworkController(network=self.network, accessed_regions=("foward", "backward", "random"), reference_speed=Point(0.0, 1.0), signal_threshold=0.5)
 
     def test_constant_speed_network_controller(self):
-        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0, generator=TestNetworkController.generator)
+        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0)
         controlled_element = Element(shape=controlled_element_shape)
         
         network_controller = CSNetworkController(network=self.network, accessed_regions=("foward", "backward"), reference_speed=Point(0.0, 1.0), signal_threshold=0.5)
@@ -86,7 +78,7 @@ class TestNetworkController(TestCase):
         expected_position_cycle = [0, 1, 2, 2, 2, 1, 0]
         
         for i, expected_position in enumerate(expected_position_cycle):
-            expected_element_shape = Circle(center=possible_positions[expected_position], radius=1.0, generator=TestNetworkController.generator)
+            expected_element_shape = Circle(center=possible_positions[expected_position], radius=1.0)
             expected_element = Element(shape=expected_element_shape)
 
             network_controller.update(controlled_element)
