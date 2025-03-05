@@ -22,13 +22,13 @@ class Controller:
             return False
         
     def __repr__(self) -> str:
-        """Object's representation for testing purposes."""
-        return f"{self.__class__.__name__}({self.__dict__})"
+        """Object's representation."""
+        filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
+        return f"{self.__class__.__name__}({', '.join(f'{key}={repr(value)}' for key, value in filtered_attributes.items())})"
     
     def __str__(self) -> str:
-        """Object's string representation, excluding hidden attributes."""
-        filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
-        return f"{self.__class__.__name__}({', '.join(f'{key}={value}' for key, value in filtered_attributes.items())})"
+        """Object's string representation for testing purposes."""        
+        return f"{self.__class__.__name__}({self.__dict__})"
         
     def update(self, controlled_element: Element) -> None:
         """Updates controlled element's state."""
