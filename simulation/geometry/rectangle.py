@@ -36,6 +36,11 @@ class Rectangle(Shape):
         self.width = float(width)
         self.height = float(height)
 
+        if not self.width > 0.0:
+            raise ValueError("Rectangle's width must be bigger then zero.")
+        if not self.height > 0.0:
+            raise ValueError("Rectangle's height must be bigger then zero.")
+
         self._perimeter_points = [Point(self.width/2.0, self.height/2.0), Point(self.width/2.0, -self.height/2.0),
                                  Point(-self.width/2.0, -self.height/2.0), Point(-self.width/2.0, self.height/2.0)]
 

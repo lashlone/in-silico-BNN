@@ -37,6 +37,11 @@ class IsoscelesTriangle(Shape):
         self.base = float(base)
         self.height = float(height)
         
+        if not self.base > 0.0:
+            raise ValueError("Triangle's base must be bigger then zero.")
+        if not self.height > 0.0:
+            raise ValueError("Triangle's height must be bigger then zero.")
+        
         self._perimeter_points = [Point(self.height/2.0, 0.0),
                                   Point(-self.height/2.0, -self.base/2.0),
                                   Point(-self.height/2.0, self.base/2.0)]

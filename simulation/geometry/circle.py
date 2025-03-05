@@ -26,6 +26,9 @@ class Circle(Shape):
         super().__init__(center, orientation, generator, fill, stroke)
         self.radius = float(radius)
 
+        if not self.radius > 0.0:
+            raise ValueError("Circle's radius must be bigger then zero.")
+
     def contains_point(self, global_point: Point) -> bool:
         return (global_point - self.center).squared_norm() <= (self.radius + TOLERANCE) **2.0
 
