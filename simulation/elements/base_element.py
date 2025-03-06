@@ -29,10 +29,12 @@ class Element:
         self.speed = speed
         self.acceleration = acceleration
 
-    def __eq__(self, other: Element) -> bool:
-        """Checks if two Elements are equal."""
+    def __eq__(self, other) -> bool:
+        """Checks if two Simulation are equal."""
         if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
+            self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
+            other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
+            return self_filtered_dict == other_filtered_dict
         else:
             return False
 

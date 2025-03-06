@@ -35,9 +35,11 @@ class Shape:
         self.stroke = str(stroke)
 
     def __eq__(self, other) -> bool:
-        """Checks if two Shapes are equal."""
+        """Checks if two Shape are equal."""
         if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
+            self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
+            other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
+            return self_filtered_dict == other_filtered_dict
         else:
             return False
         

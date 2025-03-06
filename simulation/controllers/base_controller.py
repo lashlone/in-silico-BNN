@@ -14,10 +14,12 @@ class Controller:
     def __init__(self):
         """Base class for all Controller objects."""
 
-    def __eq__(self, other: Controller) -> bool:
-        """Checks if two Controller are equal."""
+    def __eq__(self, other) -> bool:
+        """Checks if two Simulation are equal."""
         if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
+            self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
+            other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
+            return self_filtered_dict == other_filtered_dict
         else:
             return False
         
