@@ -4,12 +4,7 @@ from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
-import numpy as np
-
 class TestBaseElement(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.generator = np.random.default_rng()
 
     def setUp(self):
         main_element_shape = Circle(center=Point(0.0, 0.0), radius=5.0)
