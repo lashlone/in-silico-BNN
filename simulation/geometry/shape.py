@@ -18,21 +18,21 @@ class Shape:
     center: Point
     orientation: float
     fill: str
-    stroke: str
+    outline: str
 
-    def __init__(self, center: Point, orientation: float, fill: str, stroke: str):
+    def __init__(self, center: Point, orientation: float, fill: str, outline: str):
         """Base class for all Shape objects."""
         if not isinstance(center, Point):
             raise TypeError(f"unsupported parameter type(s) for center: '{type(center).__name__}'")
         if not bool(re.match(HEX_PATTERN, str(fill))):
             raise ValueError(f"Unsupported hexadecimal pattern for fill ({fill}).")
-        if not bool(re.match(HEX_PATTERN, str(stroke))):
-            raise ValueError(f"Unsupported hexadecimal pattern for stroke ({stroke}).")
+        if not bool(re.match(HEX_PATTERN, str(outline))):
+            raise ValueError(f"Unsupported hexadecimal pattern for stroke ({outline}).")
         
         self.center = center
         self.orientation = float(orientation)
         self.fill = str(fill)
-        self.stroke = str(stroke)
+        self.outline = str(outline)
 
     def __eq__(self, other) -> bool:
         """Checks if two Shape are equal."""

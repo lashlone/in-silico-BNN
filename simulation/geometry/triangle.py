@@ -22,7 +22,7 @@ class IsoscelesTriangle(Shape):
     _edge_normal_vectors: list[Point]
     _edge_reference_vectors: list[Point]
 
-    def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """
         Creates a isosceles triangular shape based on its center, its base and its height.
             - center: the center's coordinates of the rectangle boxing the triangle object.
@@ -33,7 +33,7 @@ class IsoscelesTriangle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, fill, stroke)
+        super().__init__(center, orientation, fill, outline)
         self.base = float(base)
         self.height = float(height)
         

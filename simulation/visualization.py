@@ -18,12 +18,12 @@ def create_frame(svg_width: int, svg_height: int, shapes: list[Shape], positions
     
     for shape, pos in zip(shapes, positions):            
         if isinstance(shape, Circle):
-            draw.ellipse((pos.x - shape.radius, pos.y - shape.radius, pos.x + shape.radius, pos.y + shape.radius), outline=shape.stroke, width=2, fill=shape.fill)
+            draw.ellipse((pos.x - shape.radius, pos.y - shape.radius, pos.x + shape.radius, pos.y + shape.radius), outline=shape.outline, width=2, fill=shape.fill)
 
         elif isinstance(shape, (Rectangle, IsoscelesTriangle)):
             center_movement = pos - shape.center
             polygon_points = [(point.x + center_movement.x, point.y + center_movement.y) for point in shape.get_perimeter_corners()]
-            draw.polygon(polygon_points, outline=shape.stroke, width=2, fill=shape.fill)
+            draw.polygon(polygon_points, outline=shape.outline, width=2, fill=shape.fill)
 
     return img
 

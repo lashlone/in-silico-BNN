@@ -21,7 +21,7 @@ class Rectangle(Shape):
     _edge_normal_vectors: list[Point]
     _edge_reference_vectors: list[Point]
 
-    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """
         Creates a rectangular shape based on its center, its width and its height.
             - center: the center's coordinates of the rectangle.
@@ -32,7 +32,7 @@ class Rectangle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, fill, stroke)
+        super().__init__(center, orientation, fill, outline)
         self.width = float(width)
         self.height = float(height)
 

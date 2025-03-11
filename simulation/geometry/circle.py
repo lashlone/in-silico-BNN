@@ -14,7 +14,7 @@ class Circle(Shape):
     """Creates a circular shape based on its center and its radius."""
     radius: float
     
-    def __init__(self, center: Point, radius: float, orientation: float = 0.0, fill: str = "#FFFFFF", stroke: str = "#FFFFFF"):
+    def __init__(self, center: Point, radius: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """Creates a circular shape based on its center and its radius.
             - center: the center's coordinates of the circle.
             - radius: radius of the circle object.
@@ -23,7 +23,7 @@ class Circle(Shape):
             - fill (optional): Shape background color, in hexadecimal (default white).
             - stroke (optional): Shape perimeter color, in hexadecimal (default white).
         """
-        super().__init__(center, orientation, fill, stroke)
+        super().__init__(center, orientation, fill, outline)
         self.radius = float(radius)
 
         if not self.radius > 0.0:
