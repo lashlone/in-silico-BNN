@@ -1,5 +1,5 @@
 """
-Exception classes module.
+Geometry exception classes' module.
 """
 
 class EdgeError(Exception):

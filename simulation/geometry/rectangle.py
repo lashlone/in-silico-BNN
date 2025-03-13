@@ -30,7 +30,7 @@ class Rectangle(Shape):
             - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis.
             - generator (optional): Generator object to use when generating random values.
             - fill (optional): Shape background color, in hexadecimal (default white).
-            - stroke (optional): Shape perimeter color, in hexadecimal (default white).
+            - outline (optional): Shape perimeter color, in hexadecimal (default white).
         """
         super().__init__(center, orientation, fill, outline)
         self.width = float(width)
@@ -63,13 +63,13 @@ class Rectangle(Shape):
             return (local_circle_center - closest_point).squared_norm() <= (shape.radius)**2.0
         
         elif isinstance(shape, Shape):
-            return (any([self.contains_point(corner) for corner in shape.get_perimeter_corners()]) 
-                 or any([shape.contains_point(corner) for corner in self.get_perimeter_corners()]))
+            return (any([self.contains_point(corner) for corner in shape.get_perimeter_points()]) 
+                 or any([shape.contains_point(corner) for corner in self.get_perimeter_points()]))
         
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_corners(self) -> list[Point]:        
+    def get_perimeter_points(self) -> list[Point]:        
         return [self.translate_to_global(point) for point in self._perimeter_points]
     
     def get_random_point(self, generator: Generator) -> Point:

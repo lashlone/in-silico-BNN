@@ -76,7 +76,7 @@ class Shape:
         """Checks if another Shape object collides with this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def get_perimeter_corners(self) -> list[Point]:
+    def get_perimeter_points(self) -> list[Point]:
         """Returns a list of points that forms the corners of this shape's perimeter."""
         raise NotImplementedError("Subclasses must implement this method.")
     

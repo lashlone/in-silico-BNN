@@ -21,7 +21,7 @@ class Circle(Shape):
             - generator (optional): Generator object to use when generating random values.
             - orientation (optional): circle's orientation. This parameter is simply inherited from the shape class but is not used.
             - fill (optional): Shape background color, in hexadecimal (default white).
-            - stroke (optional): Shape perimeter color, in hexadecimal (default white).
+            - outline (optional): Shape perimeter color, in hexadecimal (default white).
         """
         super().__init__(center, orientation, fill, outline)
         self.radius = float(radius)
@@ -42,7 +42,7 @@ class Circle(Shape):
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_corners(self):
+    def get_perimeter_points(self):
         raise CurvedEdgeError("The corners of curved polygons are not defined")
     
     def get_random_point(self, generator: Generator) -> Point:
