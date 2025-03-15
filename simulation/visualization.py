@@ -22,7 +22,7 @@ def create_frame(svg_width: int, svg_height: int, shapes: list[Shape], positions
 
         elif isinstance(shape, (Rectangle, IsoscelesTriangle)):
             center_movement = pos - shape.center
-            polygon_points = [(point.x + center_movement.x, point.y + center_movement.y) for point in shape.get_perimeter_corners()]
+            polygon_points = [(point.x + center_movement.x, point.y + center_movement.y) for point in shape.get_perimeter_points()]
             draw.polygon(polygon_points, outline=shape.outline, width=2, fill=shape.fill)
 
     return img

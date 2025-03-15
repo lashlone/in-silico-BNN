@@ -20,13 +20,13 @@ class TestGeometry(TestCase):
 
     def test_circle_perimeter(self):
         with self.assertRaises(CurvedEdgeError):
-            self.circle.get_perimeter_corners()
+            self.circle.get_perimeter_points()
 
     def test_rectangle_perimeter(self):
         expected_perimeter = [Point(-0.7345, 7.0401), Point(1.7655, 2.7099),
                               Point(-1.2655, 0.9599), Point(-3.7655, 5.2901)]
         
-        result_perimeter = self.rotated_rectangle.get_perimeter_corners()
+        result_perimeter = self.rotated_rectangle.get_perimeter_points()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
 
         self.assertEqual(expected_perimeter, result_rounded_perimeter)
@@ -35,7 +35,7 @@ class TestGeometry(TestCase):
         expected_perimeter = [Point(2.4393, -3.0607),
                               Point(2.4393, 1.1820), Point(6.6820, -3.0607)]
 
-        result_perimeter = self.rotated_triangle.get_perimeter_corners()
+        result_perimeter = self.rotated_triangle.get_perimeter_points()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
 
         self.assertEqual(expected_perimeter, result_rounded_perimeter)
