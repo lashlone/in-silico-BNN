@@ -29,7 +29,7 @@ class TestGeometry(TestCase):
         result_perimeter = self.rotated_rectangle.get_perimeter_points()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
 
-        self.assertEqual(expected_perimeter, result_rounded_perimeter)
+        self.assertEqual(result_rounded_perimeter, expected_perimeter)
     
     def test_triangle_perimeter(self):
         expected_perimeter = [Point(2.4393, -3.0607),
@@ -38,7 +38,7 @@ class TestGeometry(TestCase):
         result_perimeter = self.rotated_triangle.get_perimeter_points()
         result_rounded_perimeter = [point.round(4) for point in result_perimeter]
 
-        self.assertEqual(expected_perimeter, result_rounded_perimeter)
+        self.assertEqual(result_rounded_perimeter, expected_perimeter)
 
     def test_circle_contains_point(self):
         # Test a point inside the circle
@@ -113,7 +113,7 @@ class TestGeometry(TestCase):
         expected_normal_vector = Point(0.7071, 0.7071)
         edge_point = Point(1.41421356237, 1.41421356237)
         result_normal_vector = self.circle.get_edge_normal_vector(edge_point).round(4)
-        self.assertEqual(expected_normal_vector, result_normal_vector)
+        self.assertEqual(result_normal_vector, expected_normal_vector)
 
         # Test when the point is off the perimeter of the circle. 
         with self.assertRaises(EdgeError):
@@ -125,13 +125,13 @@ class TestGeometry(TestCase):
         expected_normal_vector = Point(0.0, 1.0)
         edge_point = Point(-0.25, 2.5)
         result_normal_vector = self.rotated_rectangle.get_edge_normal_vector(edge_point).round(4)
-        self.assertEqual(expected_normal_vector, result_normal_vector)
+        self.assertEqual(result_normal_vector, expected_normal_vector)
 
         # Test when the point is on one of the corners of the rectangle.
         expected_normal_vector = Point(1.0, 0.0)
         corner_point = Point(1.75, -2.5)
         result_normal_vector = self.rotated_rectangle.get_edge_normal_vector(corner_point).round(4)
-        self.assertEqual(expected_normal_vector, result_normal_vector)
+        self.assertEqual(result_normal_vector, expected_normal_vector)
 
         # Test when the point is off the perimeter of the rectangle.
         with self.assertRaises(EdgeError):
@@ -143,13 +143,13 @@ class TestGeometry(TestCase):
         expected_normal_vector = Point(-1.0, 0.0)
         edge_point = Point(-1.5, 1.0)
         result_normal_vector = self.rotated_triangle.get_edge_normal_vector(edge_point).round(4)
-        self.assertEqual(expected_normal_vector, result_normal_vector)
+        self.assertEqual(result_normal_vector, expected_normal_vector)
 
         # Test when the point is on one of the corners of the triangle.
         expected_normal_vector = Point(0.7071, 0.7071)
         corner_point = Point(-1.5, 3.0)
         result_normal_vector = self.rotated_triangle.get_edge_normal_vector(corner_point).round(4)
-        self.assertEqual(expected_normal_vector, result_normal_vector)
+        self.assertEqual(result_normal_vector, expected_normal_vector)
 
         # Test when the point is off the perimeter of the triangle
         with self.assertRaises(EdgeError):

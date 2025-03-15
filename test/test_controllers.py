@@ -46,7 +46,7 @@ class TestPIDControllers(TestCase):
         expected_element = Element(shape=expected_element_shape)
 
         pid_controller.update(controlled_element)
-        self.assertEqual(expected_element, controlled_element)
+        self.assertEqual(controlled_element, expected_element)
 
         reference_element.update()
         
@@ -54,7 +54,7 @@ class TestPIDControllers(TestCase):
         expected_element = Element(shape=expected_element_shape)
 
         pid_controller.update(controlled_element)
-        self.assertEqual(expected_element, controlled_element)
+        self.assertEqual(controlled_element, expected_element)
 
 class TestNetworkController(TestCase):
 
@@ -89,4 +89,4 @@ class TestNetworkController(TestCase):
                 - resulting output: {controlled_element.shape.center}
             """
             
-            self.assertEqual(expected_element, controlled_element, msg)
+            self.assertEqual(controlled_element, expected_element, msg)

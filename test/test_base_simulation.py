@@ -43,7 +43,7 @@ class TestBaseElement(TestCase):
         for _ in range(10):
             self.simulation.step()
 
-        self.assertEqual(expected_elements, self.simulation._elements)
+        self.assertEqual(self.simulation._elements, expected_elements)
 
     def test_simulation_config_file(self):
         # Test save_config function
@@ -58,7 +58,7 @@ class TestBaseElement(TestCase):
 
         loaded_simulation = load_simulation(self.simulation.simulation_name)
 
-        self.assertEqual(expected_loaded_simulation, loaded_simulation)
+        self.assertEqual(loaded_simulation, expected_loaded_simulation)
 
     def test_simulation_env_history_file(self):
         # Test save_env_history function
@@ -75,4 +75,4 @@ class TestBaseElement(TestCase):
 
         loaded_env_history = load_env_history(expected_env_history_path)
 
-        self.assertEqual(expected_loaded_env_history, loaded_env_history)
+        self.assertEqual(loaded_env_history, expected_loaded_env_history)

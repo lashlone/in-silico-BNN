@@ -30,10 +30,10 @@ class TestElements(TestCase):
 
         expected_positions = [Point(0.0, 1.0), Point(0.0, 3.0), Point(0.0, 4.0)]
 
-        for position in expected_positions:
+        for expected_position in expected_positions:
             paddle.update()
 
-            self.assertEqual(position, paddle.shape.center, msg=f"\n\n{paddle} shape's center does not match {position}")
+            self.assertEqual(paddle.shape.center, expected_position, msg=f"\n\n{paddle} shape's center does not match {expected_position}")
 
         with self.assertRaises(ValueError):
             paddle.set_state(position=Point(0.0, -1.0))
@@ -52,7 +52,7 @@ class TestElements(TestCase):
 
             ball.update()
 
-            self.assertEqual(expected_ball, ball, msg=f"\n\n{ball} does not match {expected_ball}")
+            self.assertEqual(ball, expected_ball, msg=f"\n\n{ball} does not match {expected_ball}")
     
         with self.assertRaises(ValueError):
             ball.set_state(speed=Point(2.0, 2.0))
