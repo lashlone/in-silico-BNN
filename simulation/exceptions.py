@@ -1,5 +1,5 @@
 """
-Exception classes module.
+Simulation exception classes' module.
 """
 
 class LoadingError(Exception):

@@ -1,5 +1,5 @@
 """
-Exception classes module.
+Controllers exception classes' module.
 """
 
 class ControllerInitializationError(Exception):
