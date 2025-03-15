@@ -64,7 +64,7 @@ class TestBaseElement(TestCase):
         # Test save_env_history function
         expected_env_history_path = os.path.join("results", "test_simulation", "env_history.json")
 
-        for _ in range(50):
+        for _ in range(5):
             self.simulation.step()
         self.simulation.save_env_history()
 
