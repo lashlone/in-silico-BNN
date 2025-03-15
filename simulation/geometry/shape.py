@@ -51,14 +51,20 @@ class Shape:
     def __str__(self) -> str:
         """Object's string representation for testing purposes."""        
         return f"{self.__class__.__name__}({self.__dict__})"
+    
+    def copy(self) -> Shape:
+        """Returns a copy of the object as a new instance of the same class."""
+        return eval(repr(self))
 
-    def move_center(self, translation: Point) -> None:
+    def move_center(self, translation: Point) -> Shape:
         """Moves the center of this shape by a given translation vector, represented by a Point object."""
         self.center += translation
+        return self
 
-    def rotate(self, angle: float) -> None:
+    def rotate(self, angle: float) -> Shape:
         """Rotates this shape around its center by the given angle (in degrees)."""
         self.orientation += float(angle)
+        return self
 
     def translate_to_local(self, global_point: Point) -> Point:
         """Translates a point from the simulation's global coordinates to the shape's local coordinates."""
