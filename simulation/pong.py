@@ -4,8 +4,6 @@ Pong class module. Inherits from the simulation module.
 
 from __future__ import annotations
 
-import numpy as np
-
 from network.network import Network
 from simulation.base_simulation import Simulation
 from simulation.elements.ball import Ball
@@ -36,7 +34,7 @@ class Pong(Simulation):
                     network: Network,
                     ball_generation_area: Shape,
                     ball_sensory_signal_translator: PongSignalTranslator,
-                    generator: np.random.Generator | None = None,
+                    generator_seed: int,
                     ball_min_orientation: float = -60.0,
                     ball_max_orientation: float = 60.0
                 ):
@@ -73,7 +71,7 @@ class Pong(Simulation):
         self.paddle = paddle
         self.agent = agent
 
-        super().__init__(height, width, frequency, [self.ball, self.paddle, self.agent], generator)
+        super().__init__(height, width, frequency, [self.ball, self.paddle, self.agent], generator_seed=generator_seed)
 
         self.network = network
         self.ball_generation_area = ball_generation_area
@@ -85,19 +83,19 @@ class Pong(Simulation):
     def step(self) -> None:
         super().step()
         self.check_ball_collisions()
-        self.network.propagate_signal(self.ball_sensory_signal_translator.generate_sensory_signal())
+        self.network.propagate_signal(self._generator_, self.ball_sensory_signal_translator.generate_sensory_signal())
         self.network.optimize_connections()
         
     def check_ball_collisions(self) -> None:
         """Check for ball collisions and resolves its effects, either locally or by calling another method."""
         # Detects collision with top and bottom walls
-        if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.ball.shape.center.y >= self.height + self.ball.shape.radius):
+        if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.height - self.ball.shape.center.y <= self.ball.shape.radius):
             reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
             self.ball.set_state(reflected_speed)
         elif self.ball.shape.center.x <= self.ball.shape.radius:
             self.regenerate_ball()
             # self.network.reward_function()
-        elif self.ball.shape.center.x >= self.ball.shape.radius:
+        elif self.width - self.ball.shape.center.x <= self.ball.shape.radius:
             self.regenerate_ball()
             # self.network.punish_function()
         elif self.ball.collides_with(self.paddle):
@@ -108,8 +106,8 @@ class Pong(Simulation):
 
     def regenerate_ball(self) -> None:
         """Regenerate the ball object at a random position within the simulation ball generation area."""
-        ball_position = self.ball_generation_area.get_random_point()
-        ball_speed_orientation = self.generator.uniform(low=self.ball_min_orientation, high=self.ball_max_orientation)
+        ball_position = self.ball_generation_area.get_random_point(self._generator_)
+        ball_speed_orientation = self._generator_.uniform(low=self.ball_min_orientation, high=self.ball_max_orientation)
         ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
         self.ball.set_state(position=ball_position, speed=ball_speed)
 
@@ -130,16 +128,16 @@ class Pong(Simulation):
 
 class PongSignalTranslator:
     """This class allows the creation of a sensory signal from a Pong simulation object."""
-    region_name: str
+    regions_name: list[str]
     min_frequency: int
     max_frequency: int
-    nb_topographic_regions: int
-    neurons_by_regions: int
-    topographic_region_length: float
-    timer: int
-    simulation: Pong
+    _nb_topographic_regions: int
+    _neurons_by_regions: int
+    _topographic_region_length: float
+    _timer_: int
+    _simulation: Pong
 
-    def __init__(self, region_name: str, region_size: int, min_frequency: int, max_frequency: int, nb_topographic_regions: int):
+    def __init__(self, regions_name: list[str], region_size: int, min_frequency: int, max_frequency: int):
         """
         This class allows the creation of a sensory signal from a Pong simulation object.
             - region_name: name of the associated signal region in the network.
@@ -150,40 +148,41 @@ class PongSignalTranslator:
 
         This class's simulation attribute has to be defined through its setter before the generate_sensory_signal function can be called. 
         """
-        if not region_size % nb_topographic_regions == 0:
-            raise ValueError(f"Region size ({region_size}) should be a multiple of the number of topographic regions ({nb_topographic_regions}).")
-    
-        self.region_name = str(region_name)
+        if not isinstance(regions_name, list):
+            raise TypeError(f"unsupported parameter type(s) for regions_name: '{type(regions_name).__name__}'")
+            
+        self.regions_name = regions_name
+        self.region_size = int(region_size)
         self.min_frequency = int(min_frequency)
         self.max_frequency = int(max_frequency)
-        self.nb_topographic_regions = int(nb_topographic_regions)
-        self.neurons_by_regions = region_size // nb_topographic_regions
-        self.timer = 0
-        self.simulation = None
+        self._nb_topographic_regions = len(regions_name)
+        self._neurons_by_regions = region_size // self._nb_topographic_regions
+        self._timer_ = 0
+        self._simulation = None
 
     def set_simulation(self, simulation: Pong) -> PongSignalTranslator:
         """Setter for the simulation attribute."""
         if not isinstance(simulation, Pong):
             raise TypeError(f"unsupported parameter type(s) for simulation: '{type(simulation).__name__}'")
-        self.simulation = simulation
-        self.topographic_region_length = simulation.height/self.nb_topographic_regions
+        self._simulation = simulation
+        self._topographic_region_length = simulation.height/self._nb_topographic_regions
 
         return self
     
     def generate_sensory_signal(self) -> dict[str, list[float]]:
         """Generate the sensory signal from the ball for the Pong simulation."""
-        if self.simulation is None:
+        if self._simulation is None:
             raise AttributeError("simulation attribute must be initialize before using this function")
         
-        signal_frequency = self.max_frequency + (self.simulation.ball.shape.center.x/float(self.simulation.width))*(self.min_frequency - self.max_frequency)
-        signal_period = self.simulation.frequency/signal_frequency
+        signal_frequency = self.max_frequency + (self._simulation.ball.shape.center.x/float(self._simulation.width))*(self.min_frequency - self.max_frequency)
+        signal_period = self._simulation.frequency/signal_frequency
 
-        if self.timer >= signal_period:
-            triggered_region = min(self.simulation.ball.shape.center.y // self.topographic_region_length, self.nb_topographic_regions - 1)
-            sensory_signal = [1.0 if i == triggered_region else 0.0 for i in range(self.nb_topographic_regions) for _ in range(self.neurons_by_regions)]
-            self.timer = 0
+        if self._timer_ >= signal_period:
+            triggered_region_index = min(self._simulation.ball.shape.center.y // self._topographic_region_length, self._nb_topographic_regions - 1)
+            sensory_signal = {region_name: [1.0] * self.region_size if region_index == triggered_region_index else [0.0] * self.region_size for region_index, region_name in enumerate(self.regions_name)}
+            self._timer_ = 0
         else:
-            sensory_signal = [0.0] * self.neurons_by_regions * self.nb_topographic_regions
-            self.timer += 1
+            sensory_signal = None
+            self._timer_ += 1
 
-        return {self.region_name: sensory_signal}
+        return sensory_signal

@@ -42,7 +42,7 @@ class Simulation():
         if simulation_name is not None:
             self.simulation_name = str(simulation_name)
         else:
-            self.simulation_name = f"{self.__class__.__name__}_{datetime.now().strftime('%d-%m-%Y_%H:%M')}"
+            self.simulation_name = f"{self.__class__.__name__}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
         self.generator_seed = generator_seed
 

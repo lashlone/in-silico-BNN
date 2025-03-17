@@ -45,7 +45,7 @@ class ConstantSpeedNetworkController(NetworkController):
         if not len(accessed_regions) == 2:
             raise InitializationError(f"Expected to access 2 motor region and got {len(accessed_regions)} instead.")
         if not isinstance(reference_speed, Point):
-            raise TypeError(f"unsupported parameter type(s) for speed: '{type(reference_speed).__name__}'")
+            raise TypeError(f"unsupported parameter type(s) for reference_speed: '{type(reference_speed).__name__}'")
         
         self.reference_speed = reference_speed
         self.signal_threshold = float(signal_threshold)
