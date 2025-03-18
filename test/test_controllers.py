@@ -9,7 +9,7 @@ from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
-class TestNetwork(Network):
+class MockNetwork(Network):
     """Simplified Network class for testing purposes."""
     motor_signals: list[tuple[float]] = [(0.0, 0.0), (1.0, 0.3), (0.8, 1.0), (0.2, 0.7)]
     motor_signal_cycle: list[int] = [0, 0, 1, 1, 0, 2, 3, 3]
@@ -59,7 +59,7 @@ class TestPIDControllers(TestCase):
 class TestNetworkController(TestCase):
 
     def setUp(self):
-        self.network = TestNetwork()
+        self.network = MockNetwork()
     
     def test_constant_speed_network_controller_initialization(self):
         with self.assertRaises(InitializationError):

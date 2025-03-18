@@ -5,7 +5,7 @@ from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
 class TestBaseElement(TestCase):
-
+    
     def setUp(self):
         main_element_shape = Circle(center=Point(0.0, 0.0), radius=5.0)
         self.main_element = Element(shape=main_element_shape, speed=Point(1.0, -1.0), acceleration=Point(0.0, 1.0))

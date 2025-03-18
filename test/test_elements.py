@@ -9,7 +9,7 @@ from simulation.geometry.point import Point
 
 from math import sqrt
 
-class TestController(Controller):
+class MockController(Controller):
     """Simplified Controller class for testing purposes."""
     speed_increment: Point = Point(0.0, 1.0)
 
@@ -25,7 +25,7 @@ class TestElements(TestCase):
     
     def test_paddle(self):
         paddle_shape = Circle(center=Point(0.0, 0.0), radius=1.0)
-        paddle_controller = TestController()
+        paddle_controller = MockController()
         paddle = Paddle(shape=paddle_shape, controller=paddle_controller, y_range=(0.0, 4.0))
 
         expected_positions = [Point(0.0, 1.0), Point(0.0, 3.0), Point(0.0, 4.0)]
