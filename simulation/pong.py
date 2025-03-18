@@ -91,7 +91,7 @@ class Pong(Simulation):
         # Detects collision with top and bottom walls
         if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.height - self.ball.shape.center.y <= self.ball.shape.radius):
             reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
-            self.ball.set_state(reflected_speed)
+            self.ball.set_state(speed=reflected_speed)
         elif self.ball.shape.center.x <= self.ball.shape.radius:
             self.regenerate_ball()
             # self.network.reward_function()
@@ -118,7 +118,7 @@ class Pong(Simulation):
 
         speed_adjustment = paddle.speed.projection(collided_edge_normal_vector)
 
-        if self.ball.speed * collided_edge_normal_vector >= 0.0:
+        if self.ball.speed * collided_edge_normal_vector <= 0.0:
             ball_speed = self.ball.speed.reflection(collided_edge_normal_vector) + speed_adjustment
         else:
             ball_speed = self.ball.speed + speed_adjustment

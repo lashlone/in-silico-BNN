@@ -128,7 +128,7 @@ def main():
     paddle_width = 20.0
     paddle_height = 120.0
     paddle_shape_center = Point(1440.0 - (pad_x + paddle_width/2.0), 400.0)
-    paddle_y_range = (pad_y + paddle_height/2.0, 1440.0 - (pad_y + paddle_height/2.0))
+    paddle_y_range = (pad_y + paddle_height/2.0, 800.0 - (pad_y + paddle_height/2.0))
     paddle_shape = Rectangle(center=paddle_shape_center, width=paddle_width, height=paddle_height, orientation=180.0)
     paddle = Paddle(shape=paddle_shape, controller=PIDController(kp=paddle_controller_kp, ki=paddle_controller_ki, kd=paddle_controller_kd, reference=ball), y_range=paddle_y_range)
 
