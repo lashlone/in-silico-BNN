@@ -4,6 +4,7 @@ PIDController class module. Inherits from the Controller class. Used to give a m
 
 from simulation.controllers.base_controller import Controller
 from simulation.elements.base_element import Element
+from simulation.elements.paddle import Paddle
 from simulation.geometry.point import Point
 
 class PIDController(Controller):
@@ -30,7 +31,7 @@ class PIDController(Controller):
 class VerticalPositionPIDController(PIDController):
     """Creates a VerticalPIDController object that controls the element's vertical position based on a reference element."""
 
-    def update(self, controlled_element) -> None:
+    def update(self, controlled_element: Paddle) -> None:
         super().update(controlled_element)
 
         # Computes the error between the reference and the signal
@@ -49,6 +50,7 @@ class VerticalPositionPIDController(PIDController):
         # Computes the correction and applies it to the controlled element
         correction = self.kp*error + self.ki*self._cumulative_error + self.kd*differential_error
         controlled_element.shape.move_center(Point(0.0, correction))
+        controlled_element.adjust_position()
     
 
     

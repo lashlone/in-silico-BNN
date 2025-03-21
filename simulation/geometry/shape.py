@@ -86,7 +86,7 @@ class Shape:
         """Returns a list of points that forms the corners of this shape's perimeter."""
         raise NotImplementedError("Subclasses must implement this method.")
     
-    def get_random_point(self, genenrator: Generator) -> Point:
+    def get_random_point(self, generator: Generator) -> Point:
         """Return a random Point object contained within this shape."""
         raise NotImplementedError("Subclasses must implement this method.")
     
