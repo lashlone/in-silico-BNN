@@ -8,29 +8,44 @@ from simulation.elements.paddle import Paddle
 from simulation.geometry.point import Point
 
 class PIDController(Controller):
-    """Base class for PIDController object."""
+    """Base class for PIDController objects."""
     kp: float
     ki: float
     kd: float
     _cumulative_error: float
     _last_error: float | None
 
-    def __init__(self, kp: float, ki: float, kd: float, reference: Element):
-        """Base class for PIDController object."""
-        if not isinstance(reference, Element):
-            raise TypeError(f"unsupported parameter type(s) for reference: '{type(reference).__name__}'")
+    def __init__(self, kp: float, ki: float, kd: float):
+        """Base class for PIDController objects.
+            - kp: Floating value representing the proportional coefficient of the PID controller.
+            - ki: Floating value representing the integrative coefficient of the PID controller.
+            - kd: Floating value representing the derivative coefficient of the PID controller."""
         
         self.kp = float(kp)
         self.ki = float(ki)
         self.kd = float(kd)
-        self.reference = reference
 
         self._cumulative_error = 0.0
         self._last_error = None
 
 class VerticalPositionPIDController(PIDController):
-    """Creates a VerticalPIDController object that controls the element's vertical position based on a reference element."""
+    """Controls the element's vertical position based on a reference element."""
+    reference: Element
 
+    def __init__(self, kp: float, ki: float, kd: float, reference: Element):
+        """PIDController that controls the element's vertical position based on a reference element.
+            - kp: Floating value representing the proportional coefficient of the PID controller.
+            - ki: Floating value representing the integrative coefficient of the PID controller.
+            - kd: Floating value representing the derivative coefficient of the PID controller.
+            - reference: Element object whose center point is taken as the reference value while computing the error."""
+        
+        super().__init__(kp, ki, kd)
+
+        if not isinstance(reference, Element):
+            raise TypeError(f"unsupported parameter type(s) for reference: '{type(reference).__name__}'")
+        
+        self.reference = reference
+        
     def update(self, controlled_element: Paddle) -> None:
         super().update(controlled_element)
 
