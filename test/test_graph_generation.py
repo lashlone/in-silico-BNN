@@ -6,7 +6,7 @@ from network.graph_generation import fixed_average_transmission, self_referring_
 import numpy as np
 from numpy.random import Generator
 
-class TestGenerator(Generator):
+class MockGenerator(Generator):
     """Non-stochastic generator for testing purposes."""
     fixed_value: float
 
@@ -25,7 +25,7 @@ class TestGenerator(Generator):
 
 class TestBaseElement(TestCase):
     def setUp(self):
-        self.generator = TestGenerator(0.5)
+        self.generator = MockGenerator(0.5)
 
     def test_fixed_average_transmission(self):
         with self.assertRaises(ValueError):
