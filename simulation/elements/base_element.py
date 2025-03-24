@@ -1,5 +1,5 @@
 """
-Base class module. 
+Base class' module. 
 
 The Element class defined here should not directly be used as an element of a simulation and could make the simulation fail.  
 """
@@ -17,20 +17,24 @@ class Element:
     acceleration: Point
 
     def __init__(self, shape: Shape, speed: Point = Point(0.0, 0.0), acceleration: Point = Point(0.0, 0.0)):
-        """Base class for all Element objects."""
+        """Base class for all Element objects.
+            - shape: Shape object representing the shape of the element.
+            - speed (optional): Point object representing the speed of the element.
+            - acceleration (optional): Point object representing the acceleration of the element."""
+        
         if not isinstance(shape, Shape):
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         if not isinstance(speed, Point):
             raise TypeError(f"unsupported parameter type(s) for speed: '{type(speed).__name__}'")
         if not isinstance(acceleration, Point):
-            raise TypeError(f"unsupported parameter type(s) for acceleration: '{type(speed).__name__}'")
+            raise TypeError(f"unsupported parameter type(s) for acceleration: '{type(acceleration).__name__}'")
 
         self.shape = shape
         self.speed = speed
         self.acceleration = acceleration
 
     def __eq__(self, other) -> bool:
-        """Checks if two Simulation are equal."""
+        """Checks if two Element objects are equal."""
         if isinstance(other, self.__class__):
             self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
             other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
@@ -39,12 +43,12 @@ class Element:
             return False
 
     def __repr__(self) -> str:
-        """Object's representation."""
+        """Element object's representation."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
         return f"{self.__class__.__name__}({', '.join(f'{key}={repr(value)}' for key, value in filtered_attributes.items())})"
     
     def __str__(self) -> str:
-        """Object's string representation for testing purposes."""        
+        """Element object's string representation for testing purposes."""        
         return f"{self.__class__.__name__}({self.__dict__})"
 
     def set_state(self, position: Point | None = None, speed: Point | None = None, acceleration: Point | None = None) -> Element:

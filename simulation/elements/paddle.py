@@ -10,16 +10,16 @@ from simulation.geometry.shape import Shape
 from simulation.geometry.point import Point
 
 class Paddle(Element):
-    """Creates a paddle object, that moves only on the vertical axis."""
+    """Simple paddle object that moves only on the vertical axis."""
     controller: Controller
     y_range: tuple[float, float]
 
     def __init__(self, shape: Shape, controller: Controller, y_range: tuple[float, float]):
-        """
-        Creates a paddle object, that moves only on the vertical axis. This element supports every type of shapes defined in the geometry module.
-            - y_range: tuple defining the range the paddle's center can take on the vertical axis.
-            - controller: function controlled by the simulation that modifies the paddle's state.
-        """
+        """Creates a paddle object, that moves only on the vertical axis. This element supports every type of shapes defined in the geometry module.
+            - shape: Shape object representing the shape of the paddle.
+            - controller: Controller object representing the controller of the paddle (see the simulation.controller module).
+            - y_range: Tuple of floating values representing the range of y values that the paddle's center can take."""
+        
         if not isinstance(controller, Controller):
             raise TypeError(f"unsupported parameter type(s) for controller: '{type(controller).__name__}'")
         if not isinstance(y_range, tuple):
@@ -33,7 +33,7 @@ class Paddle(Element):
         self.y_range = y_range
 
     def adjust_position(self):
-        """Adjusts the object's position based on its y range"""
+        """Adjusts the paddle's position based on its y range"""
         min_y, max_y = self.y_range
         current_y = self.shape.center.y
 
