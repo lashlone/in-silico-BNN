@@ -28,9 +28,10 @@ class Simulation():
     simulation_name: str
     generator_seed: int | None
     _elements: list[Element]
-    _simulation_dir: str
+    _simulation_dir_: str
     _generator_: Generator
-    _env_history: list[tuple[str | int | Element | Point]]
+    _env_history_: list[tuple[str | int | Element | Point]]
+    _timer_: int
     
     def __init__(self, height: int, width: int, frequency: int, elements: list[Element], simulation_name: str | None = None, generator_seed: int | None = None):
         """Base class for all Simulation objects."""        
@@ -46,13 +47,14 @@ class Simulation():
 
         self.generator_seed = generator_seed
 
-        self._simulation_dir = os.path.join(RESULT_PATH_DIR, self.simulation_name)
-        os.makedirs(self._simulation_dir, exist_ok=True)
+        self._simulation_dir_ = os.path.join(RESULT_PATH_DIR, self.simulation_name)
+        os.makedirs(self._simulation_dir_, exist_ok=True)
 
         self._generator_ = Generator(PCG64(generator_seed))
         
-        self._env_history = [(self._simulation_dir, self.width, self.height), tuple(element.shape for element in self._elements)]
-        self._env_history.append(tuple(element.shape.center for element in self._elements))
+        self._env_history_ = [(self._simulation_dir_, self.width, self.height), tuple(element.shape for element in self._elements)]
+        self._env_history_.append(tuple(element.shape.center for element in self._elements))
+        self._timer_ = 0
 
     def __eq__(self, other) -> bool:
         """Checks if two Simulation are equal."""
@@ -81,19 +83,20 @@ class Simulation():
         """Updates the states of the simulation's elements based on its previous states, then resolves elements interaction."""
         for element in self._elements:
             element.update()
-        self._env_history.append(tuple(element.shape.center for element in self._elements))
+        self._env_history_.append(tuple(element.shape.center for element in self._elements))
+        self._timer_ += 1
 
     def save_config(self) -> None:
         """Saves the simulation's configuration as a json file."""
-        config_file_path = os.path.join(self._simulation_dir, "config.json")
+        config_file_path = os.path.join(self._simulation_dir_, "config.json")
         with open(config_file_path, "w") as config_file:
             json.dump(repr(self), config_file)
     
     def save_env_history(self, env_history_file_name: str = "env_history.json") -> None:
         """Saves the simulation's environnement history as a json file."""
-        env_history_file_path = os.path.join(self._simulation_dir, env_history_file_name)
+        env_history_file_path = os.path.join(self._simulation_dir_, env_history_file_name)
         with open(env_history_file_path, "w") as env_history_file:
-            json.dump(repr(self._env_history), env_history_file)
+            json.dump(repr(self._env_history_), env_history_file)
 
 def load_simulation(simulation_name: str) -> Simulation:
     """Loads a simulation from the result directory by its name and checks the format of the resulting object."""
@@ -111,7 +114,7 @@ def load_simulation(simulation_name: str) -> Simulation:
     loaded_simulation = eval(loaded_simulation_data)
     if not isinstance(loaded_simulation, Simulation):
         raise LoadingError(f"unexpected type when loading the configuration file: '{type(loaded_simulation).__name__}'")
-    if not loaded_simulation._simulation_dir == simulation_dir:
+    if not loaded_simulation._simulation_dir_ == simulation_dir:
         raise LoadingError(f"saved simulation's name ({loaded_simulation.simulation_name}) does not match its repository name ({simulation_name})")
     return loaded_simulation
         
