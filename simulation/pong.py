@@ -22,6 +22,7 @@ class Pong(Simulation):
     ball_min_orientation: float
     ball_max_orientation: float
     _ball_reference_speed: float
+    _success_rate_history_: list[tuple[bool, int]]
 
     def __init__(
                     self, 
@@ -35,8 +36,8 @@ class Pong(Simulation):
                     ball_generation_area: Shape,
                     ball_sensory_signal_translator: PongSignalTranslator,
                     generator_seed: int,
-                    ball_min_orientation: float = -60.0,
-                    ball_max_orientation: float = 60.0
+                    ball_min_orientation: float = 120.0,
+                    ball_max_orientation: float = 240.0
                 ):
         """
         Creates a simulation of the environnement of the arcade game Pong.
@@ -48,7 +49,7 @@ class Pong(Simulation):
             - agent: Paddle object, representing the paddle controlled by the agent.
             - network: Network object, representing the agent's internal state.
             - ball_generation_area: Shape object. The ball in the simulation will always be regenerated in this area when needed.
-            - generator: Generator object to use when generating random values.
+            - generator_seed: Generator object to use when generating random values.
             - ball_min_orientation (optional): float, representing the ball's orientation minimum when regenerated.
             - ball_max_orientation (optional): float, representing the ball's orientation maximum when regenerated.
         """
@@ -76,15 +77,17 @@ class Pong(Simulation):
         self.network = network
         self.ball_generation_area = ball_generation_area
         self.ball_sensory_signal_translator = ball_sensory_signal_translator.set_simulation(self)
-        self._ball_reference_speed = self.ball.speed.norm()
         self.ball_min_orientation = ball_min_orientation
         self.ball_max_orientation = ball_max_orientation
+        self._ball_reference_speed = self.ball.speed.norm()
+        self._success_rate_history_ = []
 
     def step(self) -> None:
         super().step()
         self.check_ball_collisions()
         self.network.propagate_signal(self._generator_, self.ball_sensory_signal_translator.generate_sensory_signal())
         self.network.optimize_connections()
+        self.network.compute_free_energy()
         
     def check_ball_collisions(self) -> None:
         """Check for ball collisions and resolves its effects, either locally or by calling another method."""
@@ -93,16 +96,20 @@ class Pong(Simulation):
             reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
             self.ball.set_state(speed=reflected_speed)
         elif self.ball.shape.center.x <= self.ball.shape.radius:
+            self.network.punish(self._generator_)
+            self._success_rate_history_.append((False, self._timer_))
             self.regenerate_ball()
-            # self.network.reward_function()
+            self.ball_sensory_signal_translator.reset_timer()
         elif self.width - self.ball.shape.center.x <= self.ball.shape.radius:
+            self.network.reward()
             self.regenerate_ball()
-            # self.network.punish_function()
+            self.ball_sensory_signal_translator.reset_timer()
         elif self.ball.collides_with(self.paddle):
             self.resolve_collision_with_paddle(self.paddle)
         elif self.ball.collides_with(self.agent):
+            self.network.reward()
+            self._success_rate_history_.append((True, self._timer_))
             self.resolve_collision_with_paddle(self.agent)
-            # self.network.reward_function()
 
     def regenerate_ball(self) -> None:
         """Regenerate the ball object at a random position within the simulation ball generation area."""
@@ -157,7 +164,7 @@ class PongSignalTranslator:
         self.max_frequency = int(max_frequency)
         self._nb_topographic_regions = len(regions_name)
         self._neurons_by_regions = region_size // self._nb_topographic_regions
-        self._timer_ = 0
+        self._timer_ = -1
         self._simulation = None
 
     def set_simulation(self, simulation: Pong) -> PongSignalTranslator:
@@ -169,6 +176,10 @@ class PongSignalTranslator:
 
         return self
     
+    def reset_timer(self) -> None:
+        """Resets the timer of the translator object."""
+        self._timer_ = -1
+
     def generate_sensory_signal(self) -> dict[str, list[float]]:
         """Generate the sensory signal from the ball for the Pong simulation."""
         if self._simulation is None:
@@ -177,7 +188,7 @@ class PongSignalTranslator:
         signal_frequency = self.max_frequency + (self._simulation.ball.shape.center.x/float(self._simulation.width))*(self.min_frequency - self.max_frequency)
         signal_period = self._simulation.frequency/signal_frequency
 
-        if self._timer_ >= signal_period:
+        if self._timer_ == -1 or self._timer_ >= signal_period:
             triggered_region_index = min(self._simulation.ball.shape.center.y // self._topographic_region_length, self._nb_topographic_regions - 1)
             sensory_signal = {region_name: [1.0] * self.region_size if region_index == triggered_region_index else [0.0] * self.region_size for region_index, region_name in enumerate(self.regions_name)}
             self._timer_ = 0
