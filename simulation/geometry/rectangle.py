@@ -24,22 +24,22 @@ class Rectangle(Shape):
     def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """
         Creates a rectangular shape based on its center, its width and its height.
-            - center: the center's coordinates of the rectangle.
-            - width: size of the rectangle on the x-axis.
-            - height: size of the rectangle on the y-axis.
-            - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis.
-            - generator (optional): Generator object to use when generating random values.
-            - fill (optional): Shape background color, in hexadecimal (default white).
-            - outline (optional): Shape perimeter color, in hexadecimal (default white).
-        """
+            - center: Point object representing the coordinates of the rectangle's center.
+            - width: Floating value representing the size of the rectangle parallel to its local x-axis.
+            - height: Floating value representing the size of the rectangle parallel to its local y-axis.
+            - orientation (optional): Floating value representing the angle between the rectangle's local x-axis and the simulation's x-axis.
+            - fill (optional): String representing the rectangle's background color, in hexadecimal (default white).
+            - outline (optional): String representing the rectangle's perimeter color, in hexadecimal (default white)."""
+        
         super().__init__(center, orientation, fill, outline)
+
+        if not float(width) > 0.0:
+            raise ValueError("Rectangle's width must be bigger then zero.")
+        if not float(height) > 0.0:
+            raise ValueError("Rectangle's height must be bigger then zero.")
+        
         self.width = float(width)
         self.height = float(height)
-
-        if not self.width > 0.0:
-            raise ValueError("Rectangle's width must be bigger then zero.")
-        if not self.height > 0.0:
-            raise ValueError("Rectangle's height must be bigger then zero.")
 
         self._perimeter_points = [Point(self.width/2.0, self.height/2.0), Point(self.width/2.0, -self.height/2.0),
                                  Point(-self.width/2.0, -self.height/2.0), Point(-self.width/2.0, self.height/2.0)]
@@ -56,11 +56,14 @@ class Rectangle(Shape):
 
     def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
-            local_circle_center = self.translate_to_local(shape.center)
-            closest_point = self.get_closest_point(local_circle_center)
+            if self.contains_point(shape.center):
+                return True
+            else:
+                local_circle_center = self.translate_to_local(shape.center)
+                closest_point = self.get_closest_point(local_circle_center)
 
-            # Checks if the distance from the closest point to the circle's center is smaller than its radius.
-            return (local_circle_center - closest_point).squared_norm() <= (shape.radius)**2.0
+                # Checks if the distance from the closest point to the circle's center is smaller than its radius.
+                return (local_circle_center - closest_point).squared_norm() <= (shape.radius)**2.0
         
         elif isinstance(shape, Shape):
             return (any([self.contains_point(corner) for corner in shape.get_perimeter_points()]) 
@@ -82,8 +85,31 @@ class Rectangle(Shape):
         return self.translate_to_global(Point(x, y))
     
     def get_closest_point(self, local_point):
-        closest_x = max(-self.width/2.0, min(local_point.x, self.width/2.0))
-        closest_y = max(-self.height/2.0, min(local_point.y, self.height/2.0))
+        # Calculates the closest x and y coordinates on the rectangle's perimeter.
+        closest_x = max(-self.width / 2.0, min(local_point.x, self.width / 2.0))
+        closest_y = max(-self.height / 2.0, min(local_point.y, self.height / 2.0))
+
+        # Checks if the point is inside the rectangle.
+        if self.contains_point(local_point):
+            
+            # Finds distances to each edge.
+            dist_left = abs(local_point.x - (-self.width / 2.0))
+            dist_right = abs(local_point.x - (self.width / 2.0))
+            dist_top = abs(local_point.y - (self.height / 2.0))
+            dist_bottom = abs(local_point.y - (-self.height / 2.0))
+            
+            # Determines the minimum distances on each axis.
+            min_dist_x = min(dist_left, dist_right)
+            min_dist_y = min(dist_top, dist_bottom)
+
+            # Prioritizes the vertical edges over the horizontal ones.
+            if min_dist_x <= min_dist_y:
+                # Prioritizes the left edge over the right one.
+                closest_x = -self.width / 2.0 if dist_left < dist_right else self.width / 2.0
+            else:
+                # Prioritizes the top edge over the bottom one.
+                closest_y = -self.height / 2.0 if dist_bottom < dist_top else self.height / 2.0
+
         return Point(closest_x, closest_y)
     
     def get_edge_normal_vector(self, local_point):

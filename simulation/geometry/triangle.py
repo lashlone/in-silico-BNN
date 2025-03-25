@@ -78,11 +78,14 @@ class IsoscelesTriangle(Shape):
     
     def collides_with(self, shape: Shape) -> bool:
         if isinstance(shape, Circle):
-            local_circle_center = self.translate_to_local(shape.center)
-            closest_point = self.get_closest_point(local_circle_center)
+            if self.contains_point(shape.center):
+                return True
+            else:                
+                local_circle_center = self.translate_to_local(shape.center)
+                closest_point = self.get_closest_point(local_circle_center)
 
-            # Checks if the distance from the closest point to the circle's center is smaller than its radius.
-            return (local_circle_center - closest_point).squared_norm() <= (shape.radius)**2.0
+                # Checks if the distance from the closest point to the circle's center is smaller than its radius.
+                return (local_circle_center - closest_point).squared_norm() <= (shape.radius)**2.0
         
         elif isinstance(shape, Shape):
             return (any([self.contains_point(corner) for corner in shape.get_perimeter_points()]) 
@@ -98,7 +101,7 @@ class IsoscelesTriangle(Shape):
         if not isinstance(generator, Generator):
             raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
         
-        # Generate a random point in the triangle by using the barycentric coordinate system.
+        # Generates a random point in the triangle by using the barycentric coordinate system.
         v0, v1, v2 = self._perimeter_points
 
         lambdas = generator.uniform(size=3)
@@ -114,7 +117,7 @@ class IsoscelesTriangle(Shape):
         # Checks the orientation of the circle's center compared to the triangle's incentre.
         center_orientation = (local_point + offset).orientation()
 
-        # Chooses which edge to consider based on the center's orientation
+        # Chooses which edge to consider based on the center's orientation.
         bisected_angle_degrees = degrees(bisected_angle_rad)
         if center_orientation <= bisected_angle_degrees + 90.0:
             v0, v1 = self._perimeter_points[2], self._perimeter_points[0]
