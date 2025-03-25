@@ -1,5 +1,5 @@
 """
-Base class' module. 
+Base class module. 
 
 The Controller class defined here should not directly be used as a controller of an element and will make the simulation fail.  
 """

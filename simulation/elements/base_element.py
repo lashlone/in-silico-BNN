@@ -1,5 +1,5 @@
 """
-Base class' module. 
+Base class module. 
 
 The Element class defined here should not directly be used as an element of a simulation and could make the simulation fail.  
 """

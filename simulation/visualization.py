@@ -1,5 +1,5 @@
 """
-Visualization module. This module contains functions to visualize the simulation's elements and their evolution.
+Simulation visualization module. This module contains functions to visualize the simulation's elements and their evolution.
 """
 
 import os

@@ -1,7 +1,7 @@
 """
-Base classes module.
+Base class module.
 
-The classes defined here should not directly be used as Simulation object.
+The class defined here should not directly be used as Simulation object.
 """
 
 import json
