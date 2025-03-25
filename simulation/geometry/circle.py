@@ -11,24 +11,24 @@ from simulation.geometry.point import Point
 from simulation.geometry.shape import Shape
 
 class Circle(Shape):
-    """Creates a circular shape based on its center and its radius."""
+    """Defines a circular shape based on its center and its radius."""
     radius: float
     
     def __init__(self, center: Point, radius: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
-        """Creates a circular shape based on its center and its radius.
-            - center: the center's coordinates of the circle.
-            - radius: radius of the circle object.
-            - generator (optional): Generator object to use when generating random values.
-            - orientation (optional): circle's orientation. This parameter is simply inherited from the shape class but is not used.
-            - fill (optional): Shape background color, in hexadecimal (default white).
-            - outline (optional): Shape perimeter color, in hexadecimal (default white).
-        """
+        """Defines a circular shape based on its center and its radius.
+            - center: Point object representing the coordinates of the circle's center.
+            - radius: Floating value representing the radius of the circle object.
+            - orientation (optional): Floating value representing the orientation of the circle object. This parameter is inherited from the shape class but is not used.
+            - fill (optional): String representing the circle's background color, in hexadecimal (default white).
+            - outline (optional): String representing the circle's perimeter color, in hexadecimal (default white)."""
+        
         super().__init__(center, orientation, fill, outline)
-        self.radius = float(radius)
 
-        if not self.radius > 0.0:
+        if not float(radius) > 0.0:
             raise ValueError("Circle's radius must be bigger then zero.")
-
+        
+        self.radius = float(radius)
+        
     def contains_point(self, global_point: Point) -> bool:
         return (global_point - self.center).squared_norm() <= (self.radius + TOLERANCE) **2.0
 

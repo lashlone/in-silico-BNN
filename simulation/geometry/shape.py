@@ -1,7 +1,7 @@
 """
 Base class module. 
 
-The Shape class defined here should not directly be used as the shape parameter of Element objects and will make the simulation fail.  
+The Shape class defined here should not directly be used and will make the simulation fail.  
 """
 
 from __future__ import annotations
@@ -21,13 +21,18 @@ class Shape:
     outline: str
 
     def __init__(self, center: Point, orientation: float, fill: str, outline: str):
-        """Base class for all Shape objects."""
+        """Base class for all Shape objects.
+            - center: Point object representing the center of the shape object.
+            - orientation: Floating value representing the angle between the shape's local x-axis and the simulation's x-axis.
+            - fill: String representing the shape's background color, in hexadecimal.
+            - outline: String representing the shape's perimeter color, in hexadecimal."""
+        
         if not isinstance(center, Point):
             raise TypeError(f"unsupported parameter type(s) for center: '{type(center).__name__}'")
         if not bool(re.match(HEX_PATTERN, str(fill))):
             raise ValueError(f"Unsupported hexadecimal pattern for fill ({fill}).")
         if not bool(re.match(HEX_PATTERN, str(outline))):
-            raise ValueError(f"Unsupported hexadecimal pattern for stroke ({outline}).")
+            raise ValueError(f"Unsupported hexadecimal pattern for outline ({outline}).")
         
         self.center = center
         self.orientation = float(orientation)
@@ -35,7 +40,7 @@ class Shape:
         self.outline = str(outline)
 
     def __eq__(self, other) -> bool:
-        """Checks if two Shape are equal."""
+        """Checks if two Shape objects are equal."""
         if isinstance(other, self.__class__):
             self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
             other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
@@ -44,12 +49,12 @@ class Shape:
             return False
         
     def __repr__(self) -> str:
-        """Object's representation."""
+        """Shape object's representation."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
         return f"{self.__class__.__name__}({', '.join(f'{key}={repr(value)}' for key, value in filtered_attributes.items())})"
     
     def __str__(self) -> str:
-        """Object's string representation for testing purposes."""        
+        """Shape object's string representation for testing purposes."""        
         return f"{self.__class__.__name__}({self.__dict__})"
     
     def copy(self) -> Shape:
@@ -87,7 +92,7 @@ class Shape:
         raise NotImplementedError("Subclasses must implement this method.")
     
     def get_random_point(self, generator: Generator) -> Point:
-        """Return a random Point object contained within this shape."""
+        """Return a random Point object contained within this shape, using the generator object to generate random values."""
         raise NotImplementedError("Subclasses must implement this method.")
     
     def get_closest_point(self, local_point: Point) -> Point:

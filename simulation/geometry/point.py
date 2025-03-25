@@ -63,16 +63,16 @@ class Point:
         return Point(float(other)*self.x, float(other)*self.y)
     
     def __repr__(self) -> str:
-        """Object's representation."""
+        """Point object's representation."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
         return f"{self.__class__.__name__}({', '.join(f'{key}={repr(value)}' for key, value in filtered_attributes.items())})"
     
     def __str__(self) -> str:
-        """Object's string representation for testing purposes."""        
+        """Point object's string representation for testing purposes."""        
         return f"{self.__class__.__name__}({self.__dict__})"
 
     def pprint(self) -> str:
-        """Object's clean representation."""
+        """Point object's pretty representation."""
         return f"[{self.x:.4f}, {self.y:.4f}]"
     
     def round(self, digit_number: int) -> Point:
@@ -94,7 +94,6 @@ class Point:
     
     def orientation(self) -> float:
         """Returns the orientation (between 0 and 360 degrees) of the point when considered as a vector."""
-
         # Checks if the vector is vertical.
         if self.x == 0.0:
             angle = 90.0 if self.y > 0.0 else 0.0 if self.y == 0.0 else -90.0

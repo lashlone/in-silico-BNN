@@ -23,24 +23,23 @@ class IsoscelesTriangle(Shape):
     _edge_reference_vectors: list[Point]
 
     def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
-        """
-        Creates a isosceles triangular shape based on its center, its base and its height.
-            - center: the center's coordinates of the rectangle boxing the triangle object.
-            - base: base of the triangle, parallel to the y-axis.
-            - height: height of the triangle, parallel to the x-axis.
-            - orientation (optional): angle between the shape's local x-axis and the simulation's x-axis.
-            - generator (optional): Generator object to use when generating random values.
-            - fill (optional): Shape background color, in hexadecimal (default white).
-            - outline (optional): Shape perimeter color, in hexadecimal (default white).
-        """
+        """Creates isosceles triangular shape based on its center, its base and its height.
+            - center: Point object representing the center's coordinates of the rectangle boxing the triangle.
+            - base: Floating value representing the size of the isosceles triangle's base, parallel to its local y-axis.
+            - height: Floating value representing the size of the isosceles triangle's height, parallel to its local x-axis.
+            - orientation (optional): Floating value representing the angle between the triangle's local x-axis and the simulation's x-axis.
+            - fill (optional): String representing the triangle's background color, in hexadecimal (default white).
+            - outline (optional): String representing the triangle's perimeter color, in hexadecimal (default white)."""
+        
         super().__init__(center, orientation, fill, outline)
+        
+        if not float(base) > 0.0:
+            raise ValueError("Triangle's base must be bigger then zero.")
+        if not float(height) > 0.0:
+            raise ValueError("Triangle's height must be bigger then zero.")
+        
         self.base = float(base)
         self.height = float(height)
-        
-        if not self.base > 0.0:
-            raise ValueError("Triangle's base must be bigger then zero.")
-        if not self.height > 0.0:
-            raise ValueError("Triangle's height must be bigger then zero.")
         
         self._perimeter_points = [Point(self.height/2.0, 0.0),
                                   Point(-self.height/2.0, -self.base/2.0),

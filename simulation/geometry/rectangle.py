@@ -22,8 +22,7 @@ class Rectangle(Shape):
     _edge_reference_vectors: list[Point]
 
     def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
-        """
-        Creates a rectangular shape based on its center, its width and its height.
+        """Creates a rectangular shape based on its center, its width and its height.
             - center: Point object representing the coordinates of the rectangle's center.
             - width: Floating value representing the size of the rectangle parallel to its local x-axis.
             - height: Floating value representing the size of the rectangle parallel to its local y-axis.
@@ -48,8 +47,8 @@ class Rectangle(Shape):
         self._edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector().round(8) for point1, point2 in self._edges]
         self._edge_reference_vectors = [perimeter_point.projection(normal_vector).round(8) for perimeter_point, normal_vector in zip(self._perimeter_points, self._edge_normal_vectors)]
 
-    def contains_point(self, point: Point) -> bool:
-        local_point = self.translate_to_local(point)
+    def contains_point(self, global_point: Point) -> bool:
+        local_point = self.translate_to_local(global_point)
 
         return (-(self.width/2.0 + TOLERANCE) <= local_point.x <= self.width/2.0 + TOLERANCE 
             and -(self.height/2.0 + TOLERANCE) <= local_point.y <= self.height/2.0 + TOLERANCE) 
@@ -84,7 +83,7 @@ class Rectangle(Shape):
 
         return self.translate_to_global(Point(x, y))
     
-    def get_closest_point(self, local_point):
+    def get_closest_point(self, local_point: Point) -> Point:
         # Calculates the closest x and y coordinates on the rectangle's perimeter.
         closest_x = max(-self.width / 2.0, min(local_point.x, self.width / 2.0))
         closest_y = max(-self.height / 2.0, min(local_point.y, self.height / 2.0))
@@ -112,7 +111,7 @@ class Rectangle(Shape):
 
         return Point(closest_x, closest_y)
     
-    def get_edge_normal_vector(self, local_point):
+    def get_edge_normal_vector(self, local_point: Point) -> Point:
         for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
