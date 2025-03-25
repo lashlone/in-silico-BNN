@@ -5,18 +5,19 @@ The classes defined here should not directly be used as Simulation object.
 """
 
 import json
-from numpy.random import Generator, PCG64
 import os
+
 from datetime import datetime
+from numpy.random import Generator, PCG64
 
 from simulation.exceptions import LoadingError
 from simulation.elements.base_element import Element
 
 # Imports needed for eval when loading a simulation
-from simulation.geometry.circle import Circle  # noqa: F401
-from simulation.geometry.rectangle import Rectangle # noqa: F401
-from simulation.geometry.point import Point # noqa: F401
-from simulation.geometry.triangle import IsoscelesTriangle # noqa: F401
+from simulation.geometry.circle import Circle               # noqa: F401
+from simulation.geometry.rectangle import Rectangle         # noqa: F401
+from simulation.geometry.point import Point                 # noqa: F401
+from simulation.geometry.triangle import IsoscelesTriangle  # noqa: F401
 
 RESULT_PATH_DIR = os.path.join("results")
 
@@ -34,7 +35,14 @@ class Simulation():
     _timer_: int
     
     def __init__(self, height: int, width: int, frequency: int, elements: list[Element], simulation_name: str | None = None, generator_seed: int | None = None):
-        """Base class for all Simulation objects."""        
+        """Base class for all Simulation objects.
+            - height: Integer representing the simulation height, in pixels.
+            - width: Integer representing the simulation width, in pixels.
+            - frequency: Integer representing the abstract frequency of the simulation's iteration process, in Hz.
+            - elements: list of Element objects representing the elements in the simulation.
+            - simulation_name (optional): String representing the simulation's name in the result repository. The default value is {self.__class__.__name__}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}.
+            - generator_seed (optional): Integer representing the seed used when creating the simulation's random number generator."""        
+        
         self.height = int(height)
         self.width = int(width)
         self.frequency = int(frequency)
@@ -57,7 +65,7 @@ class Simulation():
         self._timer_ = 0
 
     def __eq__(self, other) -> bool:
-        """Checks if two Simulation are equal."""
+        """Checks if two Simulation objects are equal."""
         if isinstance(other, self.__class__):
             self_filtered_dict = {key : value for key, value in self.__dict__.items() if not key.endswith('_')}
             other_filtered_dict = {key : value for key, value in other.__dict__.items() if not key.endswith('_')}
@@ -66,7 +74,7 @@ class Simulation():
             return False
 
     def __repr__(self) -> str:
-        """Object's representation."""
+        """Simulation object's representation."""
         filtered_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith('_')}
 
         # The base simulation must also include its _elements attribute in its representation, but its children must not.
@@ -76,7 +84,7 @@ class Simulation():
         return f"{self.__class__.__name__}({', '.join(f'{key}={repr(value)}' for key, value in filtered_attributes.items())})"
     
     def __str__(self) -> str:
-        """Object's string representation for testing purposes."""        
+        """Simulation object's string representation for testing purposes."""        
         return f"{self.__class__.__name__}({self.__dict__})"
 
     def step(self) -> None:
@@ -99,7 +107,7 @@ class Simulation():
             json.dump(repr(self._env_history_), env_history_file)
 
 def load_simulation(simulation_name: str) -> Simulation:
-    """Loads a simulation from the result directory by its name and checks the format of the resulting object."""
+    """Loads a simulation from the result directory by its name."""
     simulation_dir = os.path.join(RESULT_PATH_DIR, simulation_name)
     if not os.path.exists(simulation_dir):
         raise FileNotFoundError(f"simulation's directory ({simulation_dir}) was not found in the result repository.")
@@ -110,8 +118,9 @@ def load_simulation(simulation_name: str) -> Simulation:
     
     with open(config_file_path, "r") as config_file:
         loaded_simulation_data = json.load(config_file)
-
     loaded_simulation = eval(loaded_simulation_data)
+
+    # Checks the format of the resulting object.
     if not isinstance(loaded_simulation, Simulation):
         raise LoadingError(f"unexpected type when loading the configuration file: '{type(loaded_simulation).__name__}'")
     if not loaded_simulation._simulation_dir_ == simulation_dir:
@@ -119,7 +128,7 @@ def load_simulation(simulation_name: str) -> Simulation:
     return loaded_simulation
         
 def load_env_history(env_history_file_path: str) -> list[tuple[str|int|Element|Point]]:
-    """Loads a env_history file into a tuple. Does not check the format of the resulting object."""
+    """Loads a env_history file into a tuple."""
     with open(env_history_file_path, "r") as env_history_file:
         loaded_env_history_data = json.load(env_history_file)
 

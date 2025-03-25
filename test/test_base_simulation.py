@@ -71,7 +71,7 @@ class TestBaseElement(TestCase):
         self.assertTrue(os.path.exists(expected_env_history_path))
 
         # Test load_env_history
-        expected_loaded_env_history = self.simulation._env_history
+        expected_loaded_env_history = self.simulation._env_history_
 
         loaded_env_history = load_env_history(expected_env_history_path)
 
