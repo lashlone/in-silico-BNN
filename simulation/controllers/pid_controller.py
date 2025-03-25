@@ -64,8 +64,7 @@ class VerticalPositionPIDController(PIDController):
 
         # Computes the correction and applies it to the controlled element
         correction = self.kp*error + self.ki*self._cumulative_error + self.kd*differential_error
-        controlled_element.shape.move_center(Point(0.0, correction))
-        controlled_element.adjust_position()
+        controlled_element.set_state(speed=Point(0.0, correction))
     
 
     

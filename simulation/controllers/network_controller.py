@@ -60,7 +60,9 @@ class ConstantSpeedNetworkController(NetworkController):
         forward_signal, backward_signal = self.network.get_motor_signal(self.accessed_regions)
 
         # Moves the element based on the given threshold
+        controlled_element_speed = Point(0.0, 0.0)
         if forward_signal >= self.signal_threshold:
-            controlled_element.shape.move_center(self.reference_speed)
+            controlled_element_speed += self.reference_speed
         if backward_signal >= self.signal_threshold:
-            controlled_element.shape.move_center(-self.reference_speed)
+            controlled_element_speed -= self.reference_speed
+        controlled_element.set_state(speed=controlled_element_speed)
