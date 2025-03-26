@@ -7,7 +7,7 @@ from typing import Callable
 from numpy.typing import NDArray
 
 from network.exceptions import NetworkCommunicationError, NetworkInitializationError
-from network.region import Region
+from network.regions import Region
 
 import numpy as np
 from collections import deque
@@ -17,10 +17,16 @@ class Network():
     regions_connectome: dict[str, dict[str, Callable[[int, int], NDArray[np.float32]]]]
     recovery_state_energy_ratio: float
     state_history_size: int
-    decay_rate: float
+    decay_coefficient: float
     exploration_rate: float
-    strengthening_rate: float
-    _known_regions_: set[str]
+    strengthening_exponent: float
+    reward_fn_period: int
+    punish_fn_period: int 
+    punish_fn_min_signal_period: int
+    punish_fn_max_signal_period: int
+    k_value: float
+    _size_: int
+    _sensory_regions_names_ : list[str]
     _internal_regions_indexes_ : list[int]
     _region_dict_: dict[str, Region]
     _state: NDArray[np.float16]
@@ -33,28 +39,33 @@ class Network():
                     regions: list[Region],
                     regions_connectome: dict[str, dict[str, Callable[[int, int], NDArray[np.float32]]]],
                     recovery_state_energy_ratio: float = 0.5,
-                    state_history_size: int = 16,
-                    decay_rate: float = 0.005,
-                    exploration_rate: float = 0.02,
-                    strengthening_rate: float = 0.33
+                    state_history_size: int = 12,
+                    decay_coefficient: float = 0.02,
+                    exploration_rate: float = 0.001,
+                    strengthening_exponent: float = 1.1,
+                    reward_fn_period: int = 6,
+                    punish_fn_period: int = 24,
+                    punish_fn_min_signal_period: int = 4,
+                    punish_fn_max_signal_period: int = 8,
+                    k_value: float = 5e-10,
                 ):
         
         if not isinstance(regions, list):
             raise TypeError(f"unsupported parameter type(s) for regions: '{type(regions).__name__}'")
         if regions == []:
             raise ValueError("regions can not be empty.")
-        self._known_regions_ = set()
+        known_regions = set()
         for region in regions:
             if not isinstance(region, Region):
                 raise TypeError(f"unsupported element type(s) for regions: '{type(region).__name__}'")
-            if region.name in self._known_regions_:
+            if region.name in known_regions:
                 raise NetworkInitializationError("region's name in the network must be unique.")
-            self._known_regions_.add(region.name)
+            known_regions.add(region.name)
         if not isinstance(regions_connectome, dict):
             raise TypeError(f"unsupported parameter type(s) for region_connectome: '{type(regions_connectome).__name__}'")
         referenced_regions = set([str(region) for region in regions_connectome.keys()])
         referenced_regions.union(set([str(region) for region_list in regions_connectome.values() for region in region_list.keys()]))
-        unknown_regions = referenced_regions - self._known_regions_
+        unknown_regions = referenced_regions - known_regions
         if not unknown_regions == set():
             raise ValueError(f"unknown regions where used in the network's connectome's definition: {unknown_regions}")
 
@@ -62,18 +73,28 @@ class Network():
         self.regions_connectome = regions_connectome
         self.recovery_state_energy_ratio = float(recovery_state_energy_ratio)
         self.state_history_size = int(state_history_size)
-        self.decay_rate = float(decay_rate)
+        self.decay_coefficient = float(decay_coefficient)
         self.exploration_rate = float(exploration_rate)
-        self.strengthening_rate = float(strengthening_rate)
+        self.strengthening_exponent = float(strengthening_exponent)
+        self.reward_fn_period = int(reward_fn_period)
+        self.punish_fn_period = int(punish_fn_period)
+        self.punish_fn_min_signal_period = float(punish_fn_min_signal_period)
+        self.punish_fn_max_signal_period = float(punish_fn_max_signal_period)
+        self.k_value = float(k_value)
 
+        sensory_regions_names = []
         internal_regions_indexes = []
         current_index = 0
         for region in self.regions:
             region.set_neurons_index(current_index)
             if region.is_internal():
                 internal_regions_indexes += region.get_neurons_index()
+            else:
+                sensory_regions_names.append(region.name)
             current_index += region.size
 
+        self._size_ = current_index
+        self._sensory_regions_names_ = sensory_regions_names
         self._internal_regions_indexes_ = internal_regions_indexes
         self._region_dict_ = {region.name: region for region in self.regions}
         self._state = np.concatenate([region.get_state() for region in self.regions])
@@ -93,32 +114,36 @@ class Network():
 
     def compute_free_energy(self) -> float:
         """Computes the network's free energy, stores it in its history and returns the computed value"""
-        state = self.get_state()
-        triggered_neurons = np.array(state == 1.0).astype(np.float16)
-        resting_neurons = np.array(state == 0.0).astype(np.float16)
-        probability_matrix = np.nan_to_num(self._conformation, copy=True, nan=1.0)
-        resting_probability_matrix = np.prod(probability_matrix ** triggered_neurons)
-        triggering_probability_matrix = 1.0 - resting_probability_matrix
-        entropy_matrix = resting_probability_matrix * np.log(resting_probability_matrix) + triggering_probability_matrix * np.log(triggering_probability_matrix)
-        network_global_entropy = entropy_matrix @ resting_neurons
-
         internal_state = self.get_internal_state()
         internal_triggered_neurons = np.array(internal_state == 1.0).astype(np.float16)
-        internal_resting_neurons = np.array(internal_state == 0.0).astype(np.float16)
+        internal_non_triggered_neurons = np.array(internal_state != 1.0).astype(np.float16)
         internal_probability_matrix = np.nan_to_num(self.get_internal_conformation(), copy=True, nan=1.0)
-        internal_resting_probability_matrix = np.prod(internal_probability_matrix ** internal_triggered_neurons)
-        internal_triggering_probability_matrix = 1.0 - internal_resting_probability_matrix
-        internal_entropy_matrix = internal_resting_probability_matrix * np.log(internal_resting_probability_matrix) + internal_triggering_probability_matrix * np.log(internal_triggering_probability_matrix)
-        network_internal_entropy = internal_entropy_matrix @ internal_resting_neurons
+        internal_resting_probability_vector = np.prod(internal_probability_matrix ** internal_triggered_neurons, axis=1)
+        safe_internal_resting_prob_vector = np.where(internal_resting_probability_vector > 0, internal_resting_probability_vector, 1)
+        internal_triggering_probability_vector = 1.0 - internal_resting_probability_vector
+        safe_internal_triggering_prob_vector = np.where(internal_triggering_probability_vector > 0, internal_triggering_probability_vector, 1)
+        internal_entropy_vector = -safe_internal_resting_prob_vector * np.log2(safe_internal_resting_prob_vector) - safe_internal_triggering_prob_vector * np.log2(safe_internal_triggering_prob_vector)
+        network_internal_entropy = internal_entropy_vector @ internal_non_triggered_neurons
 
-        network_potential_energy = sum(internal_state)
+        state = self.get_state()
+        triggered_neurons = np.array(state == 1.0).astype(np.float16)
+        non_triggered_neurons = np.array(state != 1.0).astype(np.float16)
+        probability_matrix = np.nan_to_num(self.get_conformation(), copy=True, nan=1.0)
+        resting_probability_vector = np.prod(probability_matrix ** triggered_neurons, axis=1)
+        safe_resting_prob_vector = np.where(resting_probability_vector > 0, resting_probability_vector, 1)
+        triggering_probability_vector = 1.0 - resting_probability_vector
+        safe_triggering_prob_vector = np.where(triggering_probability_vector > 0, triggering_probability_vector, 1)
+        entropy_vector = -safe_resting_prob_vector * np.log2(safe_resting_prob_vector) - safe_triggering_prob_vector * np.log2(safe_triggering_prob_vector)
+        network_global_entropy = entropy_vector @ non_triggered_neurons
 
-        free_energy = (network_internal_entropy - network_global_entropy) + network_potential_energy
+        network_potential_energy = -sum(internal_state)
+
+        free_energy = (network_internal_entropy - network_global_entropy) - self.k_value * network_potential_energy
         self._free_energy_history_.append(free_energy)
 
         return free_energy
 
-    def propagate_signal(self, generator: np.random.Generator, sensory_signal: dict[str, list[float]] | None = None):
+    def propagate_signal(self, generator: np.random.Generator, sensory_signal: dict[str, list[float]] | None = None) -> None:
         """This method propagates the signal in the network. If given, the sensory_signal represents the sensory signal perceived by the agent from the environnement in the form of a dictionary."""
         if sensory_signal is not None:
             faulty_regions = []
@@ -134,7 +159,7 @@ class Network():
         
         self._state = np.concatenate([region.get_state() for region in self.regions])
 
-        triggered_neurons = np.floor(self._state)
+        triggered_neurons = np.array(self._state == 1.0).astype(np.float16)
         probability_matrix = np.nan_to_num(self._conformation, copy=True, nan=1.0)
         triggering_probability_matrix = 1.0 - np.prod(probability_matrix ** triggered_neurons, axis=1)
 
@@ -146,9 +171,12 @@ class Network():
                     if neuron_state == 1.0:
                         updated_state.append(self.recovery_state_energy_ratio)
 
-                    # Recovering neurons simply go back to the rest state
+                    # Recovering neurons go back to the rest state if they are not retriggered.
                     elif neuron_state == self.recovery_state_energy_ratio:
-                        updated_state.append(0.0)
+                        if generator.uniform() <= triggering_probability_matrix[neuron_index]:
+                            updated_state.append(self.recovery_state_energy_ratio)
+                        else:
+                            updated_state.append(0.0)
                     
                     # Resting neurons checks if they should trigger based on their neighbors' activity and the network's conformation
                     elif neuron_state == 0.0:
@@ -159,27 +187,67 @@ class Network():
                 region.set_state(updated_state)
         self._state_history_.append(self.get_state())
 
-    def optimize_connections(self):
-        self._conformation = self.decay_rate + (1 - self.decay_rate) * self._conformation
-        for neuron_index, neuron_state in enumerate(self._state):
-            if neuron_state == self.recovery_state_energy_ratio:
-                for neighbor_index, neighbor_state in enumerate(self._state):
+    def optimize_connections(self) -> None:
+        internal_state = self.get_internal_state()
+        last_internal_state = self.get_last_internal_state()
+        internal_conformation = self.get_internal_conformation()
+
+        new_internal_conformation = self.decay_coefficient + (1 - self.decay_coefficient) * internal_conformation
+        for neuron_index, neuron_state in enumerate(internal_state):
+            if neuron_state == 1.0:
+                for neighbor_index, neighbor_state in enumerate(last_internal_state):
                     if neighbor_state == 1.0:
-                        self._conformation[neighbor_index, neuron_index] = self.strengthening_rate * self._conformation[neighbor_index, neuron_index]
+                        new_internal_conformation[neuron_index, neighbor_index] = internal_conformation[neuron_index, neighbor_index] ** self.strengthening_exponent
                     else:
-                        self._conformation[neighbor_index, neuron_index] = max(0.0, self._conformation[neighbor_index, neuron_index] - self.exploration_rate)
+                        new_internal_conformation[neighbor_index, neuron_index] = max(internal_conformation[neighbor_index, neuron_index] - self.exploration_rate, 0.0)
+
+        self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = new_internal_conformation
+
+    def reward(self):
+        self._conformation = self._conformation ** (self.strengthening_exponent ** self.reward_fn_period)
+
+    def punish(self, generator: np.random.Generator):
+        sensory_region_periods = generator.integers(low=self.punish_fn_min_signal_period, high=self.punish_fn_max_signal_period, size=(len(self._sensory_regions_names_),))
+        sensory_region_delays = generator.integers(low=0, high=self.punish_fn_period//2, size=(len(self._sensory_regions_names_),))
+        for i in range(self.punish_fn_period):
+            sensory_signal = dict()
+            for period, delay, region_name in zip(sensory_region_periods, sensory_region_delays, self._sensory_regions_names_):
+                if i < delay:
+                    sensory_signal[region_name] = [0.0] * self._region_dict_[region_name].size
+                else:
+                    if (i - delay) % period == 0:
+                        sensory_signal[region_name] = [1.0] * self._region_dict_[region_name].size
+                    else:
+                        sensory_signal[region_name] = [0.0] * self._region_dict_[region_name].size
+
+            self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
+            self.optimize_connections()
+
+    def set_state(self, state: np.ndarray):
+        if not isinstance(state, np.ndarray):
+            raise TypeError(f"unsupported parameter type(s) for state: '{type(state).__name__}'")
+        if not len(state) == self._size_:
+            raise ValueError(f"given state array's length ({len(state)}) does not match network's size ({self._size_}).")
+        
+        for region in self.regions:
+            region.set_state(list(state[np.ix_(region.get_neurons_index())]))
+        self._state = self.get_state()
+        self._state_history_.append(self._state)
 
     def get_conformation(self):
-        return self._conformation
+        return np.copy(self._conformation)
     
     def get_state(self):
         return np.concatenate([region.get_state() for region in self.regions])
     
     def get_internal_conformation(self):
-        return self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)]
+        return np.copy(self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)])
     
     def get_internal_state(self):
         return np.concatenate([region.get_state() for region in self.regions if region.is_internal()])
+    
+    def get_last_internal_state(self):
+        return np.copy(self._state_history_[-2][np.ix_(self._internal_regions_indexes_,)])
     
     def get_motor_signal(self, accessed_regions: tuple[str]) -> list[float]:
         accessed_indexes = []
@@ -192,6 +260,6 @@ class Network():
         motor_signal = np.zeros(len(accessed_regions))
         for state in self._state_history_:
             for signal_index, list_indexes in enumerate(accessed_indexes):
-                motor_signal[signal_index] += np.mean(state[list_indexes])
+                motor_signal[signal_index] += np.mean(state.astype(np.float64)[list_indexes])
         
-        return motor_signal / self.state_history_size
+        return list(motor_signal / self.state_history_size)

@@ -30,7 +30,7 @@ class Region:
         if not isinstance(state, list):
             raise TypeError(f"unsupported parameter type(s) for state: '{type(state).__name__}'")
         if not len(state) == self.size:
-            raise NetworkCommunicationError(f"given state's length ({len(state)}) does not match region size ({self.size})", faulty_regions=self.name)
+            raise NetworkCommunicationError(f"given state's length ({len(state)}) does not match region size ({self.size}).", faulty_regions=self.name)
         self._state = np.array(state).astype(np.float16)
 
     def set_neurons_index(self, first_neuron_index: int) -> None:
