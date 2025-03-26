@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 from simulation.geometry.circle import Circle
 from simulation.geometry.exceptions import CurvedEdgeError, EdgeError
@@ -8,7 +8,7 @@ from simulation.geometry.triangle import IsoscelesTriangle
 
 from numpy.random import default_rng
 
-class TestGeometry(TestCase):
+class TestGeometry(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -155,3 +155,6 @@ class TestGeometry(TestCase):
         with self.assertRaises(EdgeError):
             outside_point = Point(-1.5, 4.0)
             self.rotated_triangle.get_edge_normal_vector(outside_point)
+
+if __name__ == "__main__":
+    unittest.main()

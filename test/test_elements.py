@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 from simulation.controllers.base_controller import Controller
 from simulation.elements.base_element import Element
@@ -21,7 +21,7 @@ class MockController(Controller):
         controlled_element.set_state(speed=incremented_speed)
         
 
-class TestElements(TestCase):
+class TestElements(unittest.TestCase):
     
     def test_paddle(self):
         paddle_shape = Circle(center=Point(0.0, 0.0), radius=1.0)
@@ -56,3 +56,6 @@ class TestElements(TestCase):
     
         with self.assertRaises(ValueError):
             ball.set_state(speed=Point(2.0, 2.0))
+            
+if __name__ == "__main__":
+    unittest.main()

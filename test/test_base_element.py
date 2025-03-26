@@ -1,10 +1,10 @@
-from unittest import TestCase
+import unittest
 
 from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 
-class TestBaseElement(TestCase):
+class TestBaseElement(unittest.TestCase):
     
     def setUp(self):
         main_element_shape = Circle(center=Point(0.0, 0.0), radius=5.0)
@@ -35,3 +35,6 @@ class TestBaseElement(TestCase):
         secondary_element = Element(shape=secondary_element_shape)
 
         self.assertTrue(self.main_element.collides_with(secondary_element))
+
+if __name__ == "__main__":
+    unittest.main()

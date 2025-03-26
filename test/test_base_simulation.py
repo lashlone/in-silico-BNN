@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 from simulation.base_simulation import Simulation, load_simulation, load_env_history
 from simulation.elements.base_element import Element
@@ -9,7 +9,7 @@ from simulation.geometry.triangle import IsoscelesTriangle
 
 import os
 
-class TestBaseElement(TestCase):
+class TestBaseElement(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.generator_seed = 1111
@@ -76,3 +76,6 @@ class TestBaseElement(TestCase):
         loaded_env_history = load_env_history(expected_env_history_path)
 
         self.assertEqual(loaded_env_history, expected_loaded_env_history)
+        
+if __name__ == "__main__":
+    unittest.main()

@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 from numpy.testing import assert_equal
 
 from network.graph_generation import fixed_average_transmission, self_referring_fixed_average_transmission
@@ -23,7 +23,7 @@ class MockGenerator(Generator):
         else:
             return self.fixed_value * np.ones(size)
 
-class TestBaseElement(TestCase):
+class TestGraphGeneration(unittest.TestCase):
     def setUp(self):
         self.generator = MockGenerator(0.5)
 
@@ -51,3 +51,6 @@ class TestBaseElement(TestCase):
         result_connections = result_fn(2, 2)
 
         assert_equal(result_connections, expected_connections)
+        
+if __name__ == "__main__":
+    unittest.main()

@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 from network.exceptions import NetworkCommunicationError as CommunicationError
 from network.network import Network
@@ -31,7 +31,7 @@ class MockNetwork(Network):
 
         return self.motor_signals[self.motor_signal_cycle[self.signal_cycle_index]]
 
-class TestPIDControllers(TestCase):
+class TestPIDControllers(unittest.TestCase):
     
     def test_vertical_PID_controller(self):
         reference_element_shape = Circle(center=Point(5.0, 0.0), radius=1.0)
@@ -58,7 +58,7 @@ class TestPIDControllers(TestCase):
         controlled_element.update()
         self.assertEqual(controlled_element, expected_element)
 
-class TestNetworkController(TestCase):
+class TestNetworkController(unittest.TestCase):
 
     def setUp(self):
         self.network = MockNetwork()
@@ -95,3 +95,6 @@ class TestNetworkController(TestCase):
             """
             
             self.assertEqual(controlled_element, expected_element, msg)
+            
+if __name__ == "__main__":
+    unittest.main()
