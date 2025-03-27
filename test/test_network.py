@@ -73,11 +73,11 @@ class TestNetwork(unittest.TestCase):
         expected_conformation = np.array([[np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
                                           [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
                                           [0.8, 0.8, np.nan, 0.804, 0.804, 0.804, 0.804, 0.804, 0.804],
-                                          [np.nan, np.nan, 0.804, np.nan, 0.79, 0.804, 0.804, 0.804, 0.804],
-                                          [0.8, 0.8, 0.782346214,  0.804, np.nan, 0.804, 0.804, 0.804, 0.782346214],
-                                          [np.nan, np.nan, 0.804, 0.804, 0.79, np.nan, 0.804, 0.804, 0.804],
-                                          [np.nan, np.nan, 0.804, 0.804, 0.79, 0.804, np.nan, 0.804, 0.804],
-                                          [0.8, 0.8, 0.804, 0.804, 0.79, 0.804, 0.804, np.nan, 0.804],
+                                          [np.nan, np.nan, 0.804, np.nan, 0.794, 0.804, 0.804, 0.804, 0.804],
+                                          [0.8, 0.8, 0.7866501931,  0.804, np.nan, 0.804, 0.804, 0.804, 0.7866501931],
+                                          [np.nan, np.nan, 0.804, 0.804, 0.794, np.nan, 0.804, 0.804, 0.804],
+                                          [np.nan, np.nan, 0.804, 0.804, 0.794, 0.804, np.nan, 0.804, 0.804],
+                                          [0.8, 0.8, 0.804, 0.804, 0.794, 0.804, 0.804, np.nan, 0.804],
                                           [np.nan, np.nan, 0.804, 0.804, 0.804, 0.804, 0.804, 0.804, np.nan],])
         
         self.network.propagate_signal(self.generator)

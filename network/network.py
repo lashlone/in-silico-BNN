@@ -192,16 +192,16 @@ class Network():
         last_internal_state = self.get_last_internal_state()
         internal_conformation = self.get_internal_conformation()
 
-        new_internal_conformation = self.decay_coefficient + (1 - self.decay_coefficient) * internal_conformation
+        internal_conformation = self.decay_coefficient + (1 - self.decay_coefficient) * internal_conformation
         for neuron_index, neuron_state in enumerate(internal_state):
             if neuron_state == 1.0:
                 for neighbor_index, neighbor_state in enumerate(last_internal_state):
                     if neighbor_state == 1.0:
-                        new_internal_conformation[neuron_index, neighbor_index] = internal_conformation[neuron_index, neighbor_index] ** self.strengthening_exponent
+                        internal_conformation[neuron_index, neighbor_index] = internal_conformation[neuron_index, neighbor_index] ** self.strengthening_exponent
                     else:
-                        new_internal_conformation[neighbor_index, neuron_index] = max(internal_conformation[neighbor_index, neuron_index] - self.exploration_rate, 0.0)
+                        internal_conformation[neighbor_index, neuron_index] = max(internal_conformation[neighbor_index, neuron_index] - self.exploration_rate, 0.0)
 
-        self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = new_internal_conformation
+        self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
     def reward(self):
         self._conformation = self._conformation ** (self.strengthening_exponent ** self.reward_fn_period)
