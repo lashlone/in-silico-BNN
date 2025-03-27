@@ -12,7 +12,7 @@ if __name__ == "__main__":
     decay_coefficient = float(arguments[1])
     exploration_rate = float(arguments[2])
     strengthening_rate = float(arguments[3])
-    simulation_name = f"Pong_{decay_coefficient:.02f}_{exploration_rate:.02f}_{strengthening_rate}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
+    simulation_name = f"Pong_{decay_coefficient:.02f}_{exploration_rate:.03f}_{strengthening_rate}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
     simulation = init_simulation(decay_coefficient, exploration_rate, strengthening_rate, simulation_name)
     simulation_dir = simulation.get_simulation_dir()
