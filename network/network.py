@@ -199,7 +199,7 @@ class Network():
                     if neighbor_state == 1.0:
                         internal_conformation[neuron_index, neighbor_index] = internal_conformation[neuron_index, neighbor_index] ** self.strengthening_exponent
                     else:
-                        internal_conformation[neighbor_index, neuron_index] = max(internal_conformation[neighbor_index, neuron_index] - self.exploration_rate, 0.0)
+                        internal_conformation[neighbor_index, neuron_index] = internal_conformation[neighbor_index, neuron_index] * (1 - self.exploration_rate)
 
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
