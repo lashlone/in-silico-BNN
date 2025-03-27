@@ -44,7 +44,7 @@ class Network():
                     exploration_rate: float = 0.001,
                     strengthening_exponent: float = 1.1,
                     reward_fn_period: int = 6,
-                    punish_fn_period: int = 24,
+                    punish_fn_period: int = 18,
                     punish_fn_min_signal_period: int = 4,
                     punish_fn_max_signal_period: int = 8,
                     k_value: float = 1,
@@ -204,7 +204,13 @@ class Network():
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
     def reward(self):
-        self._conformation = self._conformation ** (self.strengthening_exponent ** self.reward_fn_period)
+        internal_conformation = self.get_internal_conformation()
+
+        for _ in range(self.reward_fn_period):
+            internal_conformation = self.decay_coefficient + (1 - self.decay_coefficient) * internal_conformation
+            internal_conformation = internal_conformation ** self.strengthening_exponent
+        
+        self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
     def punish(self, generator: np.random.Generator):
         sensory_region_periods = generator.integers(low=self.punish_fn_min_signal_period, high=self.punish_fn_max_signal_period, size=(len(self._sensory_regions_names_),))
