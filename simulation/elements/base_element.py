@@ -30,6 +30,7 @@ class Element:
             raise TypeError(f"unsupported parameter type(s) for acceleration: '{type(acceleration).__name__}'")
 
         self.shape = shape
+        self.position = shape.center
         self.speed = speed
         self.acceleration = acceleration
 
@@ -58,6 +59,7 @@ class Element:
                 raise TypeError(f"unsupported parameter type(s) for position: '{type(position).__name__}'")
             else:
                 self.shape.center = position
+                self.position = position
 
         if speed is not None:
             if not isinstance(speed, Point):
@@ -76,6 +78,7 @@ class Element:
     def update(self) -> None:
         """Updates the element's state based on its current state."""
         self.shape.move_center(self.speed)
+        self.position = self.shape.center
         self.speed += self.acceleration
 
     def collides_with(self, other: Element) -> bool:
