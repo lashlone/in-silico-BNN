@@ -81,7 +81,7 @@ class Pong(Simulation):
         self.ball_min_orientation = ball_min_orientation
         self.ball_max_orientation = ball_max_orientation
         self._ball_reference_speed = self.ball.speed.norm()
-        self._agent_initial_position = self.agent.position
+        self._agent_initial_position = self.agent.get_position()
         self._success_rate_history_ = []
 
     def step(self) -> None:
