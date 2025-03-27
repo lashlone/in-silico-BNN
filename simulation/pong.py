@@ -36,6 +36,7 @@ class Pong(Simulation):
                     ball_generation_area: Shape,
                     ball_sensory_signal_translator: PongSignalTranslator,
                     generator_seed: int,
+                    simulation_name: None | str = None,
                     ball_min_orientation: float = 120.0,
                     ball_max_orientation: float = 240.0,
                 ):
@@ -71,7 +72,7 @@ class Pong(Simulation):
         self.paddle = paddle
         self.agent = agent
 
-        super().__init__(height, width, frequency, [self.ball, self.paddle, self.agent], generator_seed=generator_seed)
+        super().__init__(height, width, frequency, [self.ball, self.paddle, self.agent], simulation_name=simulation_name, generator_seed=generator_seed)
 
         self.network = network
         self.ball_generation_area = ball_generation_area

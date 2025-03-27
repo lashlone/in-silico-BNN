@@ -106,6 +106,12 @@ class Simulation():
         with open(env_history_file_path, "w") as env_history_file:
             json.dump(repr(self._env_history_), env_history_file)
 
+    def get_env_history(self) -> list[tuple[str | int | Element | Point]]:
+        return self._env_history_.copy()
+    
+    def get_simulation_dir(self) -> str:
+        return self._simulation_dir_
+
 def load_simulation(simulation_name: str) -> Simulation:
     """Loads a simulation from the result directory by its name."""
     simulation_dir = os.path.join(RESULT_PATH_DIR, simulation_name)

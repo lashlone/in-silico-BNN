@@ -47,7 +47,7 @@ class Network():
                     punish_fn_period: int = 24,
                     punish_fn_min_signal_period: int = 4,
                     punish_fn_max_signal_period: int = 8,
-                    k_value: float = 5e-10,
+                    k_value: float = 1,
                 ):
         
         if not isinstance(regions, list):
