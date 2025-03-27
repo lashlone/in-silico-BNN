@@ -22,6 +22,7 @@ class Pong(Simulation):
     ball_min_orientation: float
     ball_max_orientation: float
     _ball_reference_speed: float
+    _agent_initial_position: Point
     _success_rate_history_: list[tuple[bool, int]]
 
     def __init__(
@@ -80,6 +81,7 @@ class Pong(Simulation):
         self.ball_min_orientation = ball_min_orientation
         self.ball_max_orientation = ball_max_orientation
         self._ball_reference_speed = self.ball.speed.norm()
+        self._agent_initial_position = self.agent.position
         self._success_rate_history_ = []
 
     def step(self) -> None:
@@ -99,11 +101,13 @@ class Pong(Simulation):
         elif self.ball.shape.center.x <= self.ball.shape.radius:
             self.network.punish(self._generator_)
             self._success_rate_history_.append((False, self._timer_))
+            self.reset_agent_position()
             self.regenerate_ball()
             self.ball_sensory_signal_translator.reset_timer()
         # Detects collisions with right wall.
         elif self.width - self.ball.shape.center.x <= self.ball.shape.radius:
             self.network.reward()
+            self.reset_agent_position()
             self.regenerate_ball()
             self.ball_sensory_signal_translator.reset_timer()
         # Detects collisions with the paddle.
@@ -114,6 +118,10 @@ class Pong(Simulation):
             self.network.reward()
             self._success_rate_history_.append((True, self._timer_))
             self.resolve_collision_with_paddle(self.agent)
+
+    def reset_agent_position(self) -> None:
+        """Resets the agent to its initial position."""
+        self.agent.set_state(position=self._agent_initial_position)
 
     def regenerate_ball(self) -> None:
         """Regenerate the ball object at a random position within the simulation ball generation area."""
