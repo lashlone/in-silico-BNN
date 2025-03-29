@@ -126,6 +126,6 @@ def generate_free_energy_graph(network: Network, simulation_dir: str, file_name:
     ax.set_title("Évolution de l'énergie libre du réseau au cours de la simulation.")
     ax.set_xlabel("Itérations")
     ax.set_ylabel("Énergie libre")
-    ax.set_ylim(-128, 128)
+    ax.set_ylim(-network._size_, network._size_)
 
     fig.savefig(os.path.join(simulation_dir, f"{file_name}.png"))
