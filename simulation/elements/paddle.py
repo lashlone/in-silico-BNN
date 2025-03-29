@@ -39,8 +39,10 @@ class Paddle(Element):
 
         if current_y < min_y:
             self.shape.move_center(Point(0.0, min_y - current_y))
+            self.speed = Point(0.0, 0.0)
         elif current_y > max_y:
             self.shape.move_center(Point(0.0, max_y - current_y))
+            self.speed = Point(0.0, 0.0)
     
     def set_state(self, position = None, speed = None, acceleration = None) -> Paddle:
         if position is not None:
