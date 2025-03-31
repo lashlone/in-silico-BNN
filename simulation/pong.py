@@ -11,6 +11,8 @@ from simulation.elements.paddle import Paddle
 from simulation.geometry.point import Point
 from simulation.geometry.shape import Shape
 
+import numpy as np
+
 class Pong(Simulation):
     """Creates a simulation of the environnement of the arcade game Pong."""
     ball: Ball
@@ -23,7 +25,7 @@ class Pong(Simulation):
     ball_max_orientation: float
     _ball_reference_speed: float
     _agent_initial_position: Point
-    _success_rate_history_: list[tuple[bool, int]]
+    _success_history_: list[tuple[bool, int]]
 
     def __init__(
                     self, 
@@ -82,7 +84,7 @@ class Pong(Simulation):
         self.ball_max_orientation = ball_max_orientation
         self._ball_reference_speed = self.ball.speed.norm()
         self._agent_initial_position = self.agent.get_position()
-        self._success_rate_history_ = []
+        self._success_history_ = []
 
     def step(self) -> None:
         super().step()
@@ -100,13 +102,12 @@ class Pong(Simulation):
         # Detects collisions with left wall.
         elif self.ball.shape.center.x <= self.ball.shape.radius:
             self.network.punish(self._generator_)
-            self._success_rate_history_.append((False, self._timer_))
+            self._success_history_.append(np.array([[0.0, self._timer_],]))
             self.reset_agent_position()
             self.regenerate_ball()
             self.ball_sensory_signal_translator.reset_timer()
         # Detects collisions with right wall.
         elif self.width - self.ball.shape.center.x <= self.ball.shape.radius:
-            self.network.reward()
             self.reset_agent_position()
             self.regenerate_ball()
             self.ball_sensory_signal_translator.reset_timer()
@@ -116,7 +117,7 @@ class Pong(Simulation):
         # Detects collisions with the agent.
         elif self.ball.collides_with(self.agent):
             self.network.reward()
-            self._success_rate_history_.append((True, self._timer_))
+            self._success_history_.append(np.array([[1.0, self._timer_],]))
             self.resolve_collision_with_paddle(self.agent)
 
     def reset_agent_position(self) -> None:
@@ -143,6 +144,9 @@ class Pong(Simulation):
             ball_speed = self.ball.speed + speed_adjustment
 
         self.ball.set_state(speed=ball_speed)
+
+    def get_success_history(self):
+        return np.concatenate(self._success_history_, axis=0)
 
 
 class PongSignalTranslator:

@@ -60,7 +60,7 @@ class Simulation():
 
         self._generator_ = Generator(PCG64(generator_seed))
         
-        self._env_history_ = [(self._simulation_dir_, self.width, self.height), tuple(element.shape for element in self._elements)]
+        self._env_history_ = [tuple(element.shape for element in self._elements)]
         self._env_history_.append(tuple(element.shape.center for element in self._elements))
         self._timer_ = 0
 
@@ -111,6 +111,9 @@ class Simulation():
     
     def get_simulation_dir(self) -> str:
         return self._simulation_dir_
+    
+    def get_time(self) -> int:
+        return self._timer_
 
 def load_simulation(simulation_name: str) -> Simulation:
     """Loads a simulation from the result directory by its name."""
