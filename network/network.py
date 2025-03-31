@@ -145,6 +145,9 @@ class Network():
 
     def propagate_signal(self, generator: np.random.Generator, sensory_signal: dict[str, list[float]] | None = None) -> None:
         """This method propagates the signal in the network. If given, the sensory_signal represents the sensory signal perceived by the agent from the environnement in the form of a dictionary."""
+        self._state = np.concatenate([region.get_state() for region in self.regions])
+
+        # Applies sensory_signal
         if sensory_signal is not None:
             faulty_regions = []
             for region_name in sensory_signal:
@@ -156,8 +159,6 @@ class Network():
                 raise NetworkCommunicationError(f"unknown region '{faulty_regions}'", faulty_regions=faulty_regions)
         else:
             sensory_signal = []
-        
-        self._state = np.concatenate([region.get_state() for region in self.regions])
 
         triggered_neurons = np.array(self._state == 1.0).astype(np.float16)
         probability_matrix = np.nan_to_num(self._conformation, copy=True, nan=1.0)
@@ -243,9 +244,9 @@ class Network():
     def get_conformation(self):
         return np.copy(self._conformation)
     
-    def get_state(self):
-        return np.concatenate([region.get_state() for region in self.regions])
-    
+    def get_free_energy_history(self):
+        return self._free_energy_history_.copy()
+
     def get_internal_conformation(self):
         return np.copy(self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)])
     
@@ -269,3 +270,9 @@ class Network():
                 motor_signal[signal_index] += np.mean(state.astype(np.float64)[list_indexes])
         
         return list(motor_signal / self.state_history_size)
+    
+    def get_size(self):
+        return self._size_
+    
+    def get_state(self):
+        return np.concatenate([region.get_state() for region in self.regions])
