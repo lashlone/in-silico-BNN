@@ -63,8 +63,7 @@ def draw_network(network: Network, layout: list[tuple[float, float]], weight_att
     Draws a neural network's representation based on a structured layout.
         - network: Network object to draw from.
         - layout: list of position for the network's neurons in the generated graph.
-        - weight_attenuation (optional): float coefficient used to show only the main connections.
-    """
+        - weight_attenuation (optional): float coefficient used to show only the main connections."""
     if not isinstance(network, Network):
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
     if not isinstance(layout, list):
@@ -115,17 +114,19 @@ def draw_network(network: Network, layout: list[tuple[float, float]], weight_att
     return fig
 
 def generate_free_energy_graph(network: Network, simulation_dir: str, file_name: str = "free_energy_evolution"):
+    """Generates the graph of the network's free energy evolution."""
     if not isinstance(network, Network):
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
     if not os.path.isdir(simulation_dir):
         raise ValueError(f"given simulation directory ({simulation_dir}) does not exist.")
+    network_size = network.get_size()
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.plot(network._free_energy_history_)
+    ax.plot(network.get_free_energy_history())
     ax.set_title("Évolution de l'énergie libre du réseau au cours de la simulation.")
     ax.set_xlabel("Itérations")
     ax.set_ylabel("Énergie libre")
-    ax.set_ylim(0, -2.0 * network._size_)
+    ax.set_ylim(0, -2.0 * network_size)
 
     fig.savefig(os.path.join(simulation_dir, f"{file_name}.png"))

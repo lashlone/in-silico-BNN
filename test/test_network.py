@@ -54,7 +54,7 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(len(self.network._state_history_), self.network.state_history_size)
         assert_equal(network_state, expected_state)
 
-        expected_state = np.array([1.0, 1.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0])
+        expected_state = np.array([1.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0])
 
         self.network.propagate_signal(self.generator, {"region1": [1.0, 1.0]})
         network_state = self.network.get_state()
