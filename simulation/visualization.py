@@ -77,4 +77,5 @@ def generate_success_rate_graph(simulation: Pong, file_name: str = "success_rate
     ax.legend()
 
     fig.savefig(os.path.join(simulation.get_simulation_dir(), f"{file_name}.png"))
+    plt.close(fig)
     

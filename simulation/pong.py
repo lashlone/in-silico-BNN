@@ -11,7 +11,9 @@ from simulation.elements.paddle import Paddle
 from simulation.geometry.point import Point
 from simulation.geometry.shape import Shape
 
+import json
 import numpy as np
+import os
 
 class Pong(Simulation):
     """Creates a simulation of the environnement of the arcade game Pong."""
@@ -147,6 +149,11 @@ class Pong(Simulation):
 
     def get_success_history(self):
         return np.concatenate(self._success_history_, axis=0)
+    
+    def save_success_history(self, success_history_file_name = "success_history"):
+        success_history_file_path = os.path.join(self._simulation_dir_, f"{success_history_file_name}.json")
+        with open(success_history_file_path, "w") as success_history_file:
+            json.dump(repr(self._success_history_), success_history_file)
 
 
 class PongSignalTranslator:

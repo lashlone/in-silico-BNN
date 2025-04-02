@@ -9,7 +9,9 @@ from numpy.typing import NDArray
 from network.exceptions import NetworkCommunicationError, NetworkInitializationError
 from network.regions import Region
 
+import json
 import numpy as np
+import os
 from collections import deque
 
 class Network():
@@ -276,3 +278,8 @@ class Network():
     
     def get_state(self):
         return np.concatenate([region.get_state() for region in self.regions])
+    
+    def save_free_energy_history(self, simulation_dir, free_energy_history_file_name = "free_energy_history"):
+        free_energy_history_file_path = os.path.join(simulation_dir, f"{free_energy_history_file_name}.json")
+        with open(free_energy_history_file_path, "w") as free_energy_history_file:
+            json.dump(repr(self._free_energy_history_), free_energy_history_file)
