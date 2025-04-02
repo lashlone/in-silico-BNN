@@ -49,7 +49,7 @@ class Network():
                     punish_fn_period: int = 16,
                     punish_fn_min_signal_period: int = 4,
                     punish_fn_max_signal_period: int = 8,
-                    k_value: float = 1,
+                    k_value: float = 1.0,
                 ):
         
         if not isinstance(regions, list):
@@ -117,17 +117,8 @@ class Network():
     def compute_free_energy(self) -> float:
         """Computes the network's free energy, stores it in its history and returns the computed value"""
         internal_state = self.get_internal_state()
-        internal_triggered_neurons = np.array(internal_state == 1.0).astype(np.float16)
-        internal_non_triggered_neurons = np.array(internal_state != 1.0).astype(np.float16)
-        internal_probability_matrix = np.nan_to_num(self.get_internal_conformation(), copy=True, nan=1.0)
-        internal_resting_probability_vector = np.prod(internal_probability_matrix ** internal_triggered_neurons, axis=1)
-        safe_internal_resting_prob_vector = np.where(internal_resting_probability_vector > 0, internal_resting_probability_vector, 1)
-        internal_triggering_probability_vector = 1.0 - internal_resting_probability_vector
-        safe_internal_triggering_prob_vector = np.where(internal_triggering_probability_vector > 0, internal_triggering_probability_vector, 1)
-        internal_entropy_vector = -safe_internal_resting_prob_vector * np.log2(safe_internal_resting_prob_vector) - safe_internal_triggering_prob_vector * np.log2(safe_internal_triggering_prob_vector)
-        network_internal_entropy = internal_entropy_vector @ internal_non_triggered_neurons
-
         state = self.get_state()
+
         triggered_neurons = np.array(state == 1.0).astype(np.float16)
         non_triggered_neurons = np.array(state != 1.0).astype(np.float16)
         probability_matrix = np.nan_to_num(self.get_conformation(), copy=True, nan=1.0)
@@ -140,7 +131,7 @@ class Network():
 
         network_potential_energy = -sum(internal_state)
 
-        free_energy = (network_internal_entropy - network_global_entropy) - self.k_value * network_potential_energy
+        free_energy = network_potential_energy - self.k_value * network_global_entropy 
         self._free_energy_history_.append(free_energy)
 
         return free_energy
