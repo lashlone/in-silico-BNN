@@ -23,6 +23,7 @@ class Network():
     exploration_rate: float
     strengthening_exponent: float
     reward_fn_period: int
+    reward_fn_signal_period: int
     punish_fn_period: int 
     punish_fn_min_signal_period: int
     punish_fn_max_signal_period: int
@@ -45,8 +46,9 @@ class Network():
                     decay_coefficient: float = 0.02,
                     exploration_rate: float = 0.001,
                     strengthening_exponent: float = 1.1,
-                    reward_fn_period: int = 4,
-                    punish_fn_period: int = 16,
+                    reward_fn_period: int = 12,
+                    reward_fn_signal_period: int = 4,
+                    punish_fn_period: int = 48,
                     punish_fn_min_signal_period: int = 4,
                     punish_fn_max_signal_period: int = 8,
                     k_value: float = 1.0,
@@ -79,6 +81,7 @@ class Network():
         self.exploration_rate = float(exploration_rate)
         self.strengthening_exponent = float(strengthening_exponent)
         self.reward_fn_period = int(reward_fn_period)
+        self.reward_fn_signal_period = int(reward_fn_signal_period)
         self.punish_fn_period = int(punish_fn_period)
         self.punish_fn_min_signal_period = float(punish_fn_min_signal_period)
         self.punish_fn_max_signal_period = float(punish_fn_max_signal_period)
@@ -197,14 +200,17 @@ class Network():
 
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
-    def reward(self):
-        internal_conformation = self.get_internal_conformation()
-
-        for _ in range(self.reward_fn_period):
-            internal_conformation = self.decay_coefficient + (1 - self.decay_coefficient) * internal_conformation
-            internal_conformation = internal_conformation ** self.strengthening_exponent
+    def reward(self, generator: np.random.Generator):
+        for i in range(self.reward_fn_period):
+            sensory_signal = dict()
+            for region_name in self._sensory_regions_names_:
+                if i % self.reward_fn_signal_period == 0:
+                    sensory_signal[region_name] = 1.0
+                else:
+                    sensory_signal[region_name] = 0.0
         
-        self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
+            self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
+            self.optimize_connections()
 
     def punish(self, generator: np.random.Generator):
         sensory_region_periods = generator.integers(low=self.punish_fn_min_signal_period, high=self.punish_fn_max_signal_period, size=(len(self._sensory_regions_names_),))
