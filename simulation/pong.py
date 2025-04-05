@@ -118,9 +118,7 @@ class Pong(Simulation):
             self.resolve_collision_with_paddle(self.paddle)
         # Detects collisions with the agent.
         elif self.ball.collides_with(self.agent):
-            self.network.reward()
-            self._success_history_.append(np.array([[1.0, self._timer_],]))
-            self.resolve_collision_with_paddle(self.agent)
+            self.resolve_collision_with_agent(self.agent)
 
     def reset_agent_position(self) -> None:
         """Resets the agent to its initial position."""
@@ -133,8 +131,34 @@ class Pong(Simulation):
         ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
         self.ball.set_state(position=ball_position, speed=ball_speed)
 
+    def resolve_collision_with_agent(self, paddle: Paddle):
+        """Resolves the effect of the collision between the ball and the agent."""
+        closest_point = paddle.shape.get_closest_point(paddle.shape.translate_to_local(self.ball.shape.center))
+        collided_edge_normal_vector = paddle.shape.get_edge_normal_vector(closest_point).rotate(paddle.shape.orientation)
+
+        speed_adjustment = paddle.speed.projection(collided_edge_normal_vector)
+
+        # Collision with front face
+        if collided_edge_normal_vector == Point(1.0, 0.0):
+            # Rewards the network and record the agent's success           
+            self.network.reward()
+            self._success_history_.append(np.array([[1.0, self._timer_],]))
+
+            # Randomizes the orientation of the ball to force the agent to move again.
+            ball_speed_orientation = self._generator_.uniform(low=180.0 - self.ball_max_orientation, high=180.0 - self.ball_min_orientation)
+            ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
+
+        # Collision with other faces
+        else:
+            if self.ball.speed * collided_edge_normal_vector <= 0.0:
+                ball_speed = self.ball.speed.reflection(collided_edge_normal_vector) + speed_adjustment
+            else:
+                ball_speed = self.ball.speed + speed_adjustment
+
+        self.ball.set_state(speed=ball_speed)
+
     def resolve_collision_with_paddle(self, paddle: Paddle):
-        """Resolves the effect of the collision between the ball and a paddle object"""
+        """Resolves the effect of the collision between the ball and the paddle."""
         closest_point = paddle.shape.get_closest_point(paddle.shape.translate_to_local(self.ball.shape.center))
         collided_edge_normal_vector = paddle.shape.get_edge_normal_vector(closest_point).rotate(paddle.shape.orientation)
 
