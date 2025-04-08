@@ -4,19 +4,24 @@ import sys
 from datetime import datetime
 from tqdm import tqdm
 
-from demonstration.initialization import init_simulation
+from demonstration.initialization import init_catch_simulation, init_pong_simulation
 from network.visualization import get_standard_layout, draw_network, generate_free_energy_graph
+from simulation.geometry.point import Point
 from simulation.visualization import generate_gif, generate_success_rate_graph
 
 def batch_testing():
-    for decay_coefficient in [0.0005, 0.01, 0.02, 0.033, 0.04, 0.05, 0.066, 0.075, 0.0825, 0.1]:
-        coefficient_testing(decay_coefficient, 0.00025, 1.0125)
+    for controller_threshold in [0.0833, 0.1, 0.25, 0.33]:
+        for strengthening_rate in [1.0125, 1.0133, 1.0167]:
+            coefficient_testing(0.02, 0.00025, strengthening_rate, controller_threshold)
 
-def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate):
+def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, controller_threshold):
     
-    simulation_name = f"Pong_{decay_coefficient:.02f}_{exploration_rate:.03f}_{strengthening_rate}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
+    simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.04f}_{strengthening_rate:.04f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
-    simulation = init_simulation(decay_coefficient, exploration_rate, strengthening_rate, simulation_name)
+    ball_initial_position = Point(300.0, 150.0)
+    ball_speed_norm = 4.0
+    ball_seed_orientation = 135.0
+    simulation = init_catch_simulation(ball_initial_position, ball_speed_norm, ball_seed_orientation, decay_coefficient, exploration_rate, strengthening_rate, controller_threshold, simulation_name)
     simulation_dir = simulation.get_simulation_dir()
     
     for _ in tqdm(range(5000), desc="processing simulation"):
@@ -48,5 +53,5 @@ if __name__ == "__main__":
         decay_coefficient = float(arguments[2])
         exploration_rate = float(arguments[3])
         strengthening_rate = float(arguments[4])
-        coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate)
+        coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, 0.4)
     
