@@ -141,7 +141,7 @@ class Pong(Simulation):
         # Collision with front face
         if collided_edge_normal_vector == Point(1.0, 0.0):
             # Rewards the network and record the agent's success           
-            self.network.reward()
+            self.network.reward(self._generator_)
             self._success_history_.append(np.array([[1.0, self._timer_],]))
 
             # Randomizes the orientation of the ball to force the agent to move again.

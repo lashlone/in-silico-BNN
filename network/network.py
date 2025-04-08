@@ -205,9 +205,9 @@ class Network():
             sensory_signal = dict()
             for region_name in self._sensory_regions_names_:
                 if i % self.reward_fn_signal_period == 0:
-                    sensory_signal[region_name] = 1.0
+                    sensory_signal[region_name] = [1.0]
                 else:
-                    sensory_signal[region_name] = 0.0
+                    sensory_signal[region_name] = [0.0]
         
             self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
             self.optimize_connections()
