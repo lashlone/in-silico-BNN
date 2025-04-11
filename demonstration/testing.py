@@ -10,17 +10,18 @@ from simulation.geometry.point import Point
 from simulation.visualization import generate_gif, generate_success_rate_graph
 
 def batch_testing():
-    for controller_threshold in [0.0833, 0.1, 0.25, 0.33]:
-        for strengthening_rate in [1.0125, 1.0133, 1.0167]:
-            coefficient_testing(0.02, 0.00025, strengthening_rate, controller_threshold)
+    for controller_threshold in [0.1, 0.25, 0.33, 0.40]:
+        for strengthening_rate in [1.01, 1.0125, 1.0133, 1.0167]:
+            for exploration_rate in [0.0001, 0.00025, 0.00033, 0.0004, 0.0005]:
+                coefficient_testing(0.02, exploration_rate, strengthening_rate, controller_threshold)
 
 def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, controller_threshold):
     
-    simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.04f}_{strengthening_rate:.04f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
+    simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.04f}_{strengthening_rate:.04f}_{controller_threshold:.04f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
     ball_initial_position = Point(300.0, 150.0)
-    ball_speed_norm = 4.0
-    ball_seed_orientation = 135.0
+    ball_speed_norm = 2.0
+    ball_seed_orientation = 161.5
     simulation = init_catch_simulation(ball_initial_position, ball_speed_norm, ball_seed_orientation, decay_coefficient, exploration_rate, strengthening_rate, controller_threshold, simulation_name)
     simulation_dir = simulation.get_simulation_dir()
     
@@ -53,5 +54,5 @@ if __name__ == "__main__":
         decay_coefficient = float(arguments[2])
         exploration_rate = float(arguments[3])
         strengthening_rate = float(arguments[4])
-        coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, 0.4)
+        coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, 0.37)
     
