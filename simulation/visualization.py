@@ -2,6 +2,7 @@
 Simulation visualization module. This module contains functions to visualize the simulation's elements and their evolution.
 """
 
+from simulation.catch import Catch
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
 from simulation.geometry.rectangle import Rectangle
@@ -48,9 +49,9 @@ def generate_gif(simulation: Simulation, frame_duration: int, gif_name: str = "e
     frames_img = [create_frame(env_width, env_height, shapes, frame) for frame in frames]
     frames_img[0].save(gif_path, save_all=True, append_images=frames_img[1:], frame_duration=frame_duration, loop=0)
 
-def generate_success_rate_graph(simulation: Pong, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
+def generate_success_rate_graph(simulation: Pong | Catch, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
     """Generates the graph of the simulation's success rate evolution."""
-    if not isinstance(simulation, Pong):
+    if not isinstance(simulation, (Pong, Catch)):
         raise TypeError(f"unsupported parameter type(s) for simulation: '{type(simulation).__name__}'")
     
     success_history = simulation.get_success_history()
