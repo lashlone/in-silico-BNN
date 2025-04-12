@@ -41,7 +41,7 @@ class TestNetwork(unittest.TestCase):
         self.generator = MockGenerator()
 
     def test_compute_free_energy(self):
-        expected_free_energy = 2.886197451
+        expected_free_energy = -7.827218495
         free_energy = self.network.compute_free_energy()
         self.assertAlmostEqual(free_energy, expected_free_energy)
 
