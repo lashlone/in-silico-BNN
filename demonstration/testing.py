@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+
 import os
 import sys
 
@@ -10,14 +13,14 @@ from simulation.geometry.point import Point
 from simulation.visualization import generate_gif, generate_success_rate_graph
 
 def batch_testing():
-    for controller_threshold in [0.1, 0.25, 0.33, 0.40]:
-        for strengthening_rate in [1.01, 1.0125, 1.0133, 1.0167]:
-            for exploration_rate in [0.0001, 0.00025, 0.00033, 0.0004, 0.0005]:
-                coefficient_testing(0.02, exploration_rate, strengthening_rate, controller_threshold)
+    for decay_coefficient in [0.01875, 0.019, 0.02]:
+        for strengthening_rate in [1.009, 1.01, 1.0125]:
+            for exploration_rate in [0.0003, 0.00033, 0.000375]:
+                coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, 0.4)
 
 def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, controller_threshold):
     
-    simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.04f}_{strengthening_rate:.04f}_{controller_threshold:.04f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
+    simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.05f}_{strengthening_rate:.04f}_{controller_threshold:.02f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
     ball_initial_position = Point(300.0, 150.0)
     ball_speed_norm = 2.0
