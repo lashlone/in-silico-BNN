@@ -1,3 +1,7 @@
+# MIT License
+# Copyright (c) 2025 Vincent Lachapelle
+# See LICENSE file for full license information.
+
 """
 Network class module.
 """
