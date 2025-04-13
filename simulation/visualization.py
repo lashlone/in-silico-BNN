@@ -80,3 +80,45 @@ def generate_success_rate_graph(simulation: Pong | Catch, file_name: str = "succ
     fig.savefig(os.path.join(simulation.get_simulation_dir(), f"{file_name}.png"))
     plt.close(fig)
     
+def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: str, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
+    """Generates a graph of aggregated success rate evolution for multiple Catch simulations."""
+    if not all(isinstance(sim, Catch) for sim in simulations):
+        raise TypeError("unsupported element type(s) for simulations")
+    
+    # Gathers all success histories
+    all_success_rates = []
+    all_time_stamps = []
+
+    for sim in simulations:
+        success_history = sim.get_success_history()
+
+        for i in range(len(success_history) + 1 - mean_filter_width):
+            success_rate, time_stamp = np.mean(success_history[i: i + mean_filter_width, :], axis=0)
+            all_success_rates.append(success_rate)
+            all_time_stamps.append(time_stamp)
+
+    all_success_rates = np.array(all_success_rates)
+    all_time_stamps = np.array(all_time_stamps)
+
+    # Sorts by time to prepare for interpolation
+    sorted_indices = np.argsort(all_time_stamps)
+    all_success_rates = all_success_rates[sorted_indices]
+    all_time_stamps = all_time_stamps[sorted_indices]
+
+    last_iteration = max(sim.get_time() for sim in simulations)
+    linear_interpolation_x = np.linspace(0, last_iteration, last_iteration // interpolation_fragment_size)
+    linear_interpolation_y = np.interp(linear_interpolation_x, all_time_stamps, all_success_rates)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    ax.scatter(all_time_stamps, all_success_rates, color='red', label='Taux calculés', zorder=5)
+    ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')    
+    ax.set_title("Interpolation de l'évolution du taux de succès pour plusieurs simulations")
+    ax.set_xlabel("Itérations")
+    ax.set_ylabel("Taux de succès")
+    ax.set_ylim(0.0, 1.0)
+    ax.legend()
+
+    # Saves to directory of the validation test
+    fig.savefig(os.path.join(validation_dir, f"{file_name}.png"))
+    plt.close(fig)
