@@ -53,7 +53,7 @@ class Paddle(Element):
     
         return super().set_state(position, speed, acceleration)
 
-    def update(self):
+    def update(self) -> None:
         self.controller.update(self)
         super().update()
         self.adjust_position()
