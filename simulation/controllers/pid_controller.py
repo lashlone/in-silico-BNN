@@ -49,7 +49,7 @@ class VerticalPositionPIDController(PIDController):
     def update(self, controlled_element: Paddle) -> None:
         super().update(controlled_element)
 
-        # Computes the error between the reference and the signal
+        # Computes the error between the reference and the controlled element
         error = self.reference.shape.center.y - controlled_element.shape.center.y
 
         # Handles the integration part of the controller
