@@ -47,9 +47,9 @@ class Network():
                     regions_connectome: dict[str, dict[str, Callable[[int, int], NDArray[np.float32]]]],
                     recovery_state_energy_ratio: float = 0.5,
                     state_history_size: int = 12,
-                    decay_coefficient: float = 0.02,
-                    exploration_rate: float = 0.001,
-                    strengthening_exponent: float = 1.1,
+                    decay_coefficient: float = 0.01875,
+                    exploration_rate: float = 0.0003,
+                    strengthening_exponent: float = 1.009,
                     reward_fn_period: int = 12,
                     reward_fn_signal_period: int = 4,
                     punish_fn_period: int = 48,
@@ -179,7 +179,7 @@ class Network():
                         else:
                             updated_state.append(0.0)
                     
-                    # Resting neurons checks if they should trigger based on their neighbors' activity and the network's conformation
+                    # Resting neurons keep their original state unless they were triggered.
                     elif neuron_state == 0.0:
                         if generator.uniform() <= triggering_probability_matrix[neuron_index]:
                             updated_state.append(1.0)
@@ -204,7 +204,7 @@ class Network():
 
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
-    def reward(self, generator: np.random.Generator):
+    def reward(self, generator: np.random.Generator) -> None:
         for i in range(self.reward_fn_period):
             sensory_signal = dict()
             for region_name in self._sensory_regions_names_:
@@ -216,7 +216,7 @@ class Network():
             self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
             self.optimize_connections()
 
-    def punish(self, generator: np.random.Generator):
+    def punish(self, generator: np.random.Generator) -> None:
         sensory_region_periods = generator.integers(low=self.punish_fn_min_signal_period, high=self.punish_fn_max_signal_period, size=(len(self._sensory_regions_names_),))
         sensory_region_delays = generator.integers(low=0, high=self.punish_fn_period//2, size=(len(self._sensory_regions_names_),))
         for i in range(self.punish_fn_period):
@@ -233,8 +233,8 @@ class Network():
             self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
             self.optimize_connections()
 
-    def set_state(self, state: np.ndarray):
-        if not isinstance(state, np.ndarray):
+    def set_state(self, state: NDArray[np.float16]) -> None:
+        if not isinstance(state, NDArray):
             raise TypeError(f"unsupported parameter type(s) for state: '{type(state).__name__}'")
         if not len(state) == self._size_:
             raise ValueError(f"given state array's length ({len(state)}) does not match network's size ({self._size_}).")
@@ -244,19 +244,19 @@ class Network():
         self._state = self.get_state()
         self._state_history_.append(self._state)
 
-    def get_conformation(self):
+    def get_conformation(self) -> NDArray[np.float32]:
         return np.copy(self._conformation)
     
-    def get_free_energy_history(self):
+    def get_free_energy_history(self) -> list[float]:
         return self._free_energy_history_.copy()
 
-    def get_internal_conformation(self):
+    def get_internal_conformation(self) -> NDArray[np.float32]:
         return np.copy(self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)])
     
-    def get_internal_state(self):
+    def get_internal_state(self) -> NDArray[np.float16]:
         return np.concatenate([region.get_state() for region in self.regions if region.is_internal()])
     
-    def get_last_internal_state(self):
+    def get_last_internal_state(self) -> NDArray[np.float16]:
         return np.copy(self._state_history_[-2][np.ix_(self._internal_regions_indexes_,)])
     
     def get_motor_signal(self, accessed_regions: tuple[str]) -> list[float]:
@@ -274,13 +274,13 @@ class Network():
         
         return list(motor_signal / self.state_history_size)
     
-    def get_size(self):
+    def get_size(self) -> int:
         return self._size_
     
-    def get_state(self):
+    def get_state(self) -> NDArray[np.float16]:
         return np.concatenate([region.get_state() for region in self.regions])
     
-    def save_free_energy_history(self, simulation_dir, free_energy_history_file_name = "free_energy_history"):
+    def save_free_energy_history(self, simulation_dir, free_energy_history_file_name = "free_energy_history") -> None:
         free_energy_history_file_path = os.path.join(simulation_dir, f"{free_energy_history_file_name}.json")
         with open(free_energy_history_file_path, "w") as free_energy_history_file:
             json.dump(repr(self._free_energy_history_), free_energy_history_file)

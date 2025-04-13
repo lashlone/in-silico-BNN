@@ -1,5 +1,6 @@
-
 from network.network import Network
+
+from matplotlib import patches as mpatches
 from matplotlib.figure import Figure
 
 import matplotlib.pyplot as plt
@@ -7,7 +8,6 @@ import networkx as nx
 import numpy as np
 import os
 
-from matplotlib import patches as mpatches
 
 def get_color(value: float) -> tuple[float, float, float]:
     """Returns a color interpolated between black (#000000) and yellow (#FFFF00)"""
@@ -59,11 +59,11 @@ def get_standard_layout() -> list[tuple[float, float]]:
     return positions
 
 def draw_network(network: Network, layout: list[tuple[float, float]], weight_attenuation: float = 5.0) -> Figure:
-    """
-    Draws a neural network's representation based on a structured layout.
-        - network: Network object to draw from.
-        - layout: list of position for the network's neurons in the generated graph.
-        - weight_attenuation (optional): float coefficient used to show only the main connections."""
+    """Draws a neural network's representation based on a structured layout.
+        - network: Network object used to draw.
+        - layout: list of tuples representing the positions for the network's neurons in the generated graph.
+        - weight_attenuation (optional): Float value representing the coefficient used to show only the main connections."""
+    
     if not isinstance(network, Network):
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
     if not isinstance(layout, list):
@@ -119,6 +119,7 @@ def generate_free_energy_graph(network: Network, simulation_dir: str, file_name:
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
     if not os.path.isdir(simulation_dir):
         raise ValueError(f"given simulation directory ({simulation_dir}) does not exist.")
+    
     network_size = network.get_size()
 
     fig, ax = plt.subplots(figsize=(10, 6))
