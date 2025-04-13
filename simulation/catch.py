@@ -50,11 +50,13 @@ class Catch(Simulation):
             - paddle: Paddle object representing the paddle opposing the agent.
             - agent: Paddle object representing the paddle controlled by the agent.
             - network: Network object representing the agent's internal state.
+            - ball_initial_position: Point object representing the ball's initial position.
+            - ball_reference_speed_norm: Floating value representing the ball speed's norm when regenerated.
+            - ball_reference_speed_orientation: Floating value representing the ball speed's orientation when regenerated.
             - ball_generation_area: Shape object representing the area where the ball is regenerated when needed.
-            - ball_sensory_signal_translator: PongSignalTranslator object representing the translator used to communicate with the 
-            - generator_seed: Generator object to use when generating random values.
-            - ball_min_orientation (optional): float, representing the ball's orientation minimum when regenerated.
-            - ball_max_orientation (optional): float, representing the ball's orientation maximum when regenerated."""
+            - ball_sensory_signal_translator: CatchSignalTranslator object representing the translator used to communicate with the 
+            - generator_seed: Integer representing the seed used when creating the simulation's random number generator."""
+        
         if not isinstance(ball, Ball):
             raise TypeError(f"unsupported parameter type(s) for ball: '{type(ball).__name__}'")
         if not isinstance(agent, Paddle):
@@ -120,7 +122,7 @@ class Catch(Simulation):
         """Regenerate the ball object at a random position within the simulation ball generation area."""
         self.ball.set_state(position=self.ball_initial_position, speed=self._ball_reference_speed)
 
-    def resolve_collision_with_agent(self, paddle: Paddle):
+    def resolve_collision_with_agent(self, paddle: Paddle) -> None:
         """Resolves the effect of the collision between the ball and the agent."""
         closest_point = paddle.shape.get_closest_point(paddle.shape.translate_to_local(self.ball.shape.center))
         collided_edge_normal_vector = paddle.shape.get_edge_normal_vector(closest_point).rotate(paddle.shape.orientation)
@@ -147,17 +149,17 @@ class Catch(Simulation):
 
             self.ball.set_state(speed=ball_speed)
 
-    def get_success_history(self):
+    def get_success_history(self) -> np.ndarray:
         return np.concatenate(self._success_history_, axis=0)
     
-    def save_success_history(self, success_history_file_name = "success_history"):
+    def save_success_history(self, success_history_file_name = "success_history") -> None:
         success_history_file_path = os.path.join(self._simulation_dir_, f"{success_history_file_name}.json")
         with open(success_history_file_path, "w") as success_history_file:
             json.dump(repr(self._success_history_), success_history_file)
 
 
 class CatchSignalTranslator:
-    """This class allows the creation of a sensory signal from a Pong simulation object."""
+    """This class allows the creation of a sensory signal from a Catch simulation object."""
     regions_name: list[str]
     min_frequency: int
     max_frequency: int
@@ -168,7 +170,7 @@ class CatchSignalTranslator:
     _simulation: Catch
 
     def __init__(self, regions_name: list[str], region_size: int, min_frequency: int, max_frequency: int):
-        """This class allows the creation of a sensory signal from a Pong simulation object.
+        """This class allows the creation of a sensory signal from a Catch simulation object.
             - region_name: name of the associated signal region in the network.
             - region_size: size of the associated signal region in the network.
             - min_frequency: minimum frequency of the signal, when the ball is farthest from the agent.

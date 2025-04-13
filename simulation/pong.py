@@ -54,10 +54,10 @@ class Pong(Simulation):
             - agent: Paddle object representing the paddle controlled by the agent.
             - network: Network object representing the agent's internal state.
             - ball_generation_area: Shape object representing the area where the ball is regenerated when needed.
-            - ball_sensory_signal_translator: PongSignalTranslator object representing the translator used to communicate with the 
-            - generator_seed: Generator object to use when generating random values.
-            - ball_min_orientation (optional): float, representing the ball's orientation minimum when regenerated.
-            - ball_max_orientation (optional): float, representing the ball's orientation maximum when regenerated."""
+            - ball_sensory_signal_translator: PongSignalTranslator object representing the translator used to communicate with the network.
+            - generator_seed: Integer representing the seed used when creating the simulation's random number generator.
+            - ball_min_orientation (optional): Floating value representing the ball's orientation minimum when regenerated.
+            - ball_max_orientation (optional): Floating value representing the ball's orientation maximum when regenerated."""
         if not isinstance(ball, Ball):
             raise TypeError(f"unsupported parameter type(s) for ball: '{type(ball).__name__}'")
         if not isinstance(paddle, Paddle):
