@@ -1,6 +1,9 @@
 # Python compilation related files
 __pycache__
 
+# Virtual environnement
+.venv
+
 # VS Code settings
 .vscode
 
