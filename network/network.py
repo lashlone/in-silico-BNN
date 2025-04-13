@@ -234,7 +234,7 @@ class Network():
             self.optimize_connections()
 
     def set_state(self, state: NDArray[np.float16]) -> None:
-        if not isinstance(state, NDArray):
+        if not isinstance(state, np.ndarray):
             raise TypeError(f"unsupported parameter type(s) for state: '{type(state).__name__}'")
         if not len(state) == self._size_:
             raise ValueError(f"given state array's length ({len(state)}) does not match network's size ({self._size_}).")

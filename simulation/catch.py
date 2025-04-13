@@ -3,6 +3,7 @@ Catch class module. Inherits from the simulation module.
 """
 
 from __future__ import annotations
+from numpy.typing import NDArray
 
 from network.network import Network
 from simulation.base_simulation import Simulation
@@ -149,7 +150,7 @@ class Catch(Simulation):
 
             self.ball.set_state(speed=ball_speed)
 
-    def get_success_history(self) -> np.ndarray:
+    def get_success_history(self) -> NDArray:
         return np.concatenate(self._success_history_, axis=0)
     
     def save_success_history(self, success_history_file_name = "success_history") -> None:
