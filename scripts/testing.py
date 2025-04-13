@@ -1,3 +1,7 @@
+"""
+This module is used for testing purposes during the building of the project.
+"""
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -7,7 +11,7 @@ import sys
 from datetime import datetime
 from tqdm import tqdm
 
-from demonstration.initialization import init_catch_simulation, init_pong_simulation
+from scripts.initialization import init_catch_simulation
 from network.visualization import get_standard_layout, draw_network, generate_free_energy_graph
 from simulation.geometry.point import Point
 from simulation.visualization import generate_gif, generate_success_rate_graph
@@ -31,13 +35,13 @@ def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate,
     for _ in tqdm(range(5000), desc="processing simulation"):
         simulation.step()
 
-    print("generating gif ...")
+    print("generating gif...")
     generate_gif(simulation, frame_duration=25)
-    print("generating free_energy_graph ...")
+    print("generating free_energy_graph...")
     generate_free_energy_graph(simulation.network, simulation_dir)
-    print("generating success_rate_graph ...")
+    print("generating success_rate_graph...")
     generate_success_rate_graph(simulation)
-    print("saving data files ...")
+    print("saving data files...")
     simulation.save_env_history()
     simulation.network.save_free_energy_history(simulation_dir)
     simulation.save_success_history()
