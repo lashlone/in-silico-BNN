@@ -137,7 +137,7 @@ class IsoscelesTriangle(Shape):
 
         return closest_point
     
-    def get_edge_normal_vector(self, local_point):
+    def get_edge_normal_vector(self, local_point) -> Point:
         for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):
