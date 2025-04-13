@@ -46,14 +46,14 @@ class TestBaseElement(unittest.TestCase):
         self.assertEqual(self.simulation._elements, expected_elements)
 
     def test_simulation_config_file(self):
-        # Test save_config function
+        # Test save_config method
         expected_config_path = os.path.join("results", "test_simulation", "config.json")
 
         self.simulation.save_config()
 
         self.assertTrue(os.path.exists(expected_config_path))
 
-        # Test load_simulation
+        # Test load_simulation function
         expected_loaded_simulation = self.simulation
 
         loaded_simulation = load_simulation(self.simulation.simulation_name)
@@ -61,7 +61,7 @@ class TestBaseElement(unittest.TestCase):
         self.assertEqual(loaded_simulation, expected_loaded_simulation)
 
     def test_simulation_env_history_file(self):
-        # Test save_env_history function
+        # Test save_env_history method
         expected_env_history_path = os.path.join("results", "test_simulation", "env_history.json")
 
         for _ in range(5):
@@ -70,7 +70,7 @@ class TestBaseElement(unittest.TestCase):
 
         self.assertTrue(os.path.exists(expected_env_history_path))
 
-        # Test load_env_history
+        # Test load_env_history function
         expected_loaded_env_history = self.simulation._env_history_
 
         loaded_env_history = load_env_history(expected_env_history_path)

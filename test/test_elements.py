@@ -1,8 +1,8 @@
 import unittest
 
 from simulation.controllers.base_controller import Controller
-from simulation.elements.base_element import Element
 from simulation.elements.ball import Ball
+from simulation.elements.base_element import Element
 from simulation.elements.paddle import Paddle
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
