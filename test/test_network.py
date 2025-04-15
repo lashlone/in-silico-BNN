@@ -35,7 +35,7 @@ class TestNetwork(unittest.TestCase):
     def setUp(self):
         regions = [ExternalRegion("region1", 2), InternalRegion("region2", 7)]
         regions_connectome = {"region1": {"region2": lambda x, y: np.ones((x, y)) * 0.2}, "region2": {"region2": lambda x, y: np.ones((x, y)) * 0.2}}
-        self.network = Network(regions, regions_connectome, k_value=1, state_history_size=2, decay_coefficient=0.02, exploration_rate=0.01)
+        self.network = Network(regions, regions_connectome, k_value=1, state_history_size=2, decay_coefficient=0.02, exploration_rate=0.01, strengthening_exponent=1.1)
         self.network.set_state(test_network_state)
         self.network._conformation = self.network._conformation * test_network_conformation
         self.generator = MockGenerator()
