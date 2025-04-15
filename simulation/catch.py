@@ -15,13 +15,15 @@ import json
 import numpy as np
 import os
 
+from math import tan, radians
+
 class Catch(Simulation):
     """Creates a simulation of the environnement of the game catch, where the ball always follows the same trajectory and the agent must catch it."""
     ball: Ball
     agent: Paddle
     network: Network
     ball_initial_position: Point
-    ball_reference_speed_norm: float
+    ball_reference_x_speed: float
     ball_reference_speed_orientation: float
     ball_sensory_signal_translator: CatchSignalTranslator
     _agent_initial_position: Point
@@ -37,7 +39,7 @@ class Catch(Simulation):
                     agent: Paddle,
                     network: Network,
                     ball_initial_position: Point,
-                    ball_reference_speed_norm: float,
+                    ball_reference_x_speed: float,
                     ball_reference_speed_orientation: float,
                     ball_sensory_signal_translator: CatchSignalTranslator,
                     generator_seed: int,
@@ -69,7 +71,7 @@ class Catch(Simulation):
         if not isinstance(ball_sensory_signal_translator, CatchSignalTranslator):
             raise TypeError(f"unsupported parameter type(s) for ball_sensory_signal_translator: '{type(ball_sensory_signal_translator).__name__}'")
         if not 100.0 < float(ball_reference_speed_orientation) < 260.0:
-            raise ValueError(f"The ball reference orientation should be between 100 and 260 degrees, not {ball_reference_speed_norm:.0f}.")
+            raise ValueError(f"The ball reference orientation should be between 100 and 260 degrees, not {ball_reference_x_speed:.0f}.")
         
         self.ball = ball
         self.agent = agent
@@ -78,12 +80,12 @@ class Catch(Simulation):
 
         self.network = network
         self.ball_initial_position = ball_initial_position
-        self.ball_reference_speed_norm = float(ball_reference_speed_norm)
+        self.ball_reference_x_speed = float(ball_reference_x_speed)
         self.ball_reference_speed_orientation = float(ball_reference_speed_orientation)
         self.ball_sensory_signal_translator = ball_sensory_signal_translator.set_simulation(self)
 
         self._agent_initial_position = self.agent.get_position()
-        self._ball_reference_speed = Point(self.ball_reference_speed_norm, 0.0).rotate(self.ball_reference_speed_orientation)
+        self._ball_reference_speed = Point(-self.ball_reference_x_speed, -self.ball_reference_x_speed * tan(radians(self.ball_reference_speed_orientation)))
         self._success_history_ = []
 
         self.ball.set_state(position=self.ball_initial_position, speed=self._ball_reference_speed)

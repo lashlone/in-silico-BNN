@@ -1,3 +1,7 @@
+"""
+This module defines functions to initialize the network, the catch simulation and the pong simulation.
+"""
+
 from network.graph_generation import fixed_average_transmission, self_referring_fixed_average_transmission
 from network.regions import ExternalRegion, InternalRegion
 from network.network import Network
@@ -41,14 +45,15 @@ INTERNAL_TO_AFFERENT_TRANSMISSION_AVERAGE = 0.35
 INTERNAL_TO_EFFERENT_TRANSMISSION_AVERAGE = 0.35
 INTERNAL_TO_SELF_TRANSMISSION_AVERAGE = 0.5
 
-# Simulations' shared default values
-HEIGHT = 300
+# Simulations' default values
+HEIGHT = 320
 WIDTH = 400
 FREQUENCY = 240
 
 PAD_X = 20.0
-PAD_Y = 20.0
+PAD_Y = 10.0
 BALL_RADIUS = 7.5
+BALL_SPEED_RANGE = (0.0005, 12.0)
 AGENT_SPEED = Point(0.0, 3.0)
 AGENT_CONTROLLER_THRESHOLD = 0.33
 SENSORY_SIGNAL_MIN_FREQUENCY = 30
@@ -59,8 +64,6 @@ SIMULATION_GENERATOR_SPEED = 7777
 PONG_PADDLE_CONTROLLER_KP = 1.0
 PONG_PADDLE_CONTROLLER_KI = 0.0
 PONG_PADDLE_CONTROLLER_KD = 0.0
-
-# Catch simulation's default values
 
 def init_network(decay_coefficient: float, exploration_rate: float, strengthening_rate: float) -> tuple[list[str], list[str], Network]:
     sensory_region_names = [f's{i}' for i in range(NB_TOPOGRAPHIC_REGIONS)]
@@ -127,13 +130,12 @@ def init_network(decay_coefficient: float, exploration_rate: float, strengthenin
 def init_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str):
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate)
 
-    agent_area_center = Point(WIDTH/2.0, HEIGHT/2.0)
+    ball_area_center = Point(WIDTH/2.0, HEIGHT/2.0)
     
     ball_speed = Point(-2.0, 2.0)
     ball_acceleration = Point(0.0, 0.0)
-    ball_speed_range = (0.00003, 12.0)
 
-    ball = Ball(shape=Circle(center=agent_area_center, radius=BALL_RADIUS), speed=ball_speed, speed_range=ball_speed_range, acceleration=ball_acceleration)
+    ball = Ball(shape=Circle(center=ball_area_center, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
     paddle_width = 15.0
     paddle_height = 60.0
@@ -149,7 +151,7 @@ def init_pong_simulation(decay_coefficient: float, exploration_rate: float, stre
     agent_controller = NetworkController(network=network, accessed_regions=tuple(efferent_region_names), reference_speed=AGENT_SPEED, signal_threshold=agent_controller_threshold)
     agent = Paddle(shape=agent_shape, controller=agent_controller, y_range=paddle_y_range)
 
-    ball_generation_area = Rectangle(center=agent_area_center, width=WIDTH/4.0, height=3.0*HEIGHT/4.0)
+    ball_generation_area = Rectangle(center=ball_area_center, width=WIDTH/4.0, height=3.0*HEIGHT/4.0)
 
     ball_sensory_signal_translator = PongSignalTranslator(sensory_region_names, SENSORY_REGION_SIZE, SENSORY_SIGNAL_MIN_FREQUENCY, SENSORY_SIGNAL_MAX_FREQUENCY)
 
@@ -169,14 +171,13 @@ def init_pong_simulation(decay_coefficient: float, exploration_rate: float, stre
 
     return simulation
 
-def init_catch_simulation(ball_initial_position: Point, ball_speed_norm: float, ball_speed_orientation: float, decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str):
+def init_catch_simulation(ball_initial_position: Point, ball_x_speed: float, ball_speed_orientation: float, decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str):
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate)
     
     ball_speed = Point(0.0, 0.0)
     ball_acceleration = Point(0.0, 0.0)
-    ball_speed_range = (0.00003, 12.0)
 
-    ball = Ball(shape=Circle(center=ball_initial_position, radius=BALL_RADIUS), speed=ball_speed, speed_range=ball_speed_range, acceleration=ball_acceleration)
+    ball = Ball(shape=Circle(center=ball_initial_position, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
     paddle_width = 15.0
     paddle_height = 60.0
@@ -197,7 +198,7 @@ def init_catch_simulation(ball_initial_position: Point, ball_speed_norm: float, 
         agent=agent,
         network=network,
         ball_initial_position=ball_initial_position,
-        ball_reference_speed_norm=ball_speed_norm,
+        ball_reference_x_speed=ball_x_speed,
         ball_reference_speed_orientation=ball_speed_orientation,
         ball_sensory_signal_translator=ball_sensory_signal_translator,
         generator_seed=SIMULATION_GENERATOR_SPEED,
