@@ -2,6 +2,7 @@
 Simulation visualization module. This module contains functions to visualize the simulation's elements and their evolution.
 """
 
+from analysis.interpolation import approximate_first_crossing
 from simulation.catch import Catch
 from simulation.geometry.circle import Circle
 from simulation.geometry.point import Point
@@ -46,10 +47,10 @@ def generate_gif(simulation: Simulation, frame_duration: int, gif_name: str = "e
 
     gif_path = os.path.join(simulation.get_simulation_dir(), f"{gif_name}.gif")
 
-    frames_img = [create_frame(env_width, env_height, shapes, frame) for frame in frames]
+    frames_img = [create_frame(env_width, env_height, shapes, frame) for i, frame in enumerate(frames) if i % 2 == 0]
     frames_img[0].save(gif_path, save_all=True, append_images=frames_img[1:], frame_duration=frame_duration, loop=0)
 
-def generate_success_rate_graph(simulation: Pong | Catch, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
+def generate_success_rate_graph(simulation: Pong | Catch, target_success_rate: float | None = None, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
     """Generates the graph of the simulation's success rate evolution."""
     if not isinstance(simulation, (Pong, Catch)):
         raise TypeError(f"unsupported parameter type(s) for simulation: '{type(simulation).__name__}'")
@@ -69,8 +70,10 @@ def generate_success_rate_graph(simulation: Pong | Catch, file_name: str = "succ
 
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    ax.scatter(time_stamps, success_rates, color='red', label='Taux calculés', zorder=5)
-    ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')    
+    ax.scatter(time_stamps, success_rates, color='#5EC6C8', label='Taux calculés', zorder=5)
+    ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')
+    if target_success_rate is not None:
+        ax.hlines(target_success_rate, 0, last_iteration, colors="#5A5A5A", label='Seuil désiré')
     ax.set_title("Interpolation de l'évolution du taux de succès au cours de la simulation.")
     ax.set_xlabel("Itérations")
     ax.set_ylabel("Taux de succès")
@@ -80,7 +83,7 @@ def generate_success_rate_graph(simulation: Pong | Catch, file_name: str = "succ
     fig.savefig(os.path.join(simulation.get_simulation_dir(), f"{file_name}.png"))
     plt.close(fig)
     
-def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: str, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
+def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: str, target_success_rate: float | None = None, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
     """Generates a graph of aggregated success rate evolution for multiple Catch simulations."""
     if not all(isinstance(sim, Catch) for sim in simulations):
         raise TypeError("unsupported element type(s) for simulations")
@@ -111,8 +114,13 @@ def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: st
 
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    ax.scatter(all_time_stamps, all_success_rates, color='red', label='Taux calculés', zorder=5)
-    ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')    
+    ax.scatter(all_time_stamps, all_success_rates, color='#5EC6C8', label='Taux calculés', zorder=5)
+    ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')
+    if target_success_rate is not None:
+        ax.hlines(target_success_rate, 0, last_iteration, colors="#5A5A5A", label='Seuil désiré')
+        crossing_time = approximate_first_crossing(linear_interpolation_x, linear_interpolation_y, target_success_rate)
+        if crossing_time is not None:
+            ax.scatter(crossing_time, target_success_rate, color="#9072B2", label=f"Taux atteint à l'itération {crossing_time}")
     ax.set_title("Interpolation de l'évolution du taux de succès pour plusieurs simulations")
     ax.set_xlabel("Itérations")
     ax.set_ylabel("Taux de succès")
