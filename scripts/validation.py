@@ -70,6 +70,7 @@ if __name__ == '__main__':
 
         print("\tgenerating success_rate_graph...")
         generate_success_rate_graph(long_simulation, TARGET_SUCCESS_RATE)
+        print(f"\tSimulation's success rate : {long_simulation.get_average_success_rate()}")
         print("\tsaving data files...")
         long_simulation.save_success_history()
     
