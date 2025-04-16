@@ -122,7 +122,7 @@ def generate_free_energy_graph(network: Network, simulation_dir: str, file_name:
     
     network_size = network.get_size()
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(4.5, 2))
 
     ax.plot(network.get_free_energy_history())
     ax.set_title("Évolution de l'énergie libre du réseau au cours de la simulation.")

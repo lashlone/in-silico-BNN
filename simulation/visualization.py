@@ -68,7 +68,7 @@ def generate_success_rate_graph(simulation: Pong | Catch, target_success_rate: f
     linear_interpolation_x = np.linspace(0, last_iteration, last_iteration // interpolation_fragment_size)
     linear_interpolation_y = np.interp(linear_interpolation_x, time_stamps, success_rates)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(4.5, 2.0))
     
     ax.scatter(time_stamps, success_rates, color='#5EC6C8', label='Taux calculés', zorder=5)
     ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')
@@ -112,7 +112,7 @@ def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: st
     linear_interpolation_x = np.linspace(0, last_iteration, last_iteration // interpolation_fragment_size)
     linear_interpolation_y = np.interp(linear_interpolation_x, all_time_stamps, all_success_rates)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(5.0, 3.5))
     
     ax.scatter(all_time_stamps, all_success_rates, color='#5EC6C8', label='Taux calculés', zorder=5)
     ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')
