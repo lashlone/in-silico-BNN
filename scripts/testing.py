@@ -60,10 +60,10 @@ def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate,
 if __name__ == "__main__":
     arguments = sys.argv
 
-    if arguments[1] == "-batch":
+    if arguments[1] in ["--batch", "-b"]:
         batch_testing()
 
-    if arguments[1] == "-coef":
+    if arguments[1] in ["--coef", "-c"]:
         decay_coefficient = float(arguments[2])
         exploration_rate = float(arguments[3])
         strengthening_rate = float(arguments[4])
