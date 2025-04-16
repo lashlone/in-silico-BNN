@@ -36,11 +36,12 @@ def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate,
     simulation = init_catch_simulation(ball_initial_position, ball_x_speed, ball_seed_orientation, decay_coefficient, exploration_rate, strengthening_rate, controller_threshold, simulation_name)
     simulation_dir = simulation.get_simulation_dir()
     
-    for _ in tqdm(range(200), desc="processing simulation"):
+    for _ in tqdm(range(1000), desc="processing simulation"):
         simulation.step()
 
     print("generating gif...")
     generate_gif(simulation, frame_duration=25)
+    print(simulation.get_average_success_rate())
     # print("generating free_energy_graph...")
     # generate_free_energy_graph(simulation.network, simulation_dir)
     # print("generating success_rate_graph...")

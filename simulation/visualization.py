@@ -114,7 +114,6 @@ def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: st
 
     fig, ax = plt.subplots(figsize=(5.0, 3.5))
     
-    ax.scatter(all_time_stamps, all_success_rates, color='#5EC6C8', label='Taux calculés', zorder=5)
     ax.plot(linear_interpolation_x, linear_interpolation_y, linestyle='--', color='black', label='Interpolation linéaire')
     if target_success_rate is not None:
         ax.hlines(target_success_rate, 0, last_iteration, colors="#5A5A5A", label='Seuil désiré')

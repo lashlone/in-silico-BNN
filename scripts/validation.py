@@ -27,6 +27,8 @@ CONTROLLER_THRESHOLD = 0.40
 BALL_INITIAL_POSITION = Point(300.0, 160.0)
 BALL_X_SPEED = 2.0
 
+TARGET_SUCCESS_RATE = 0.7
+
 if __name__ == '__main__':
     arguments = sys.argv
     ball_speed_orientation = arguments[1]
@@ -52,9 +54,10 @@ if __name__ == '__main__':
             generate_success_rate_graph(simulation)
             print("\tsaving data files...")
             simulation.save_success_history()
+            print(f"\n\tsimulation's score : {simulation.get_average_success_rate()}\n")
 
             simulations.append(simulation)
-        
+
         print("generating average success rate graph")
         generate_avg_success_rate_graph(simulations, os.path.join("results", validation_dir))
 
@@ -66,7 +69,7 @@ if __name__ == '__main__':
             long_simulation.step()
 
         print("\tgenerating success_rate_graph...")
-        generate_success_rate_graph(long_simulation)
+        generate_success_rate_graph(long_simulation, TARGET_SUCCESS_RATE)
         print("\tsaving data files...")
         long_simulation.save_success_history()
     

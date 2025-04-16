@@ -155,6 +155,10 @@ class Catch(Simulation):
     def get_success_history(self) -> NDArray:
         return np.concatenate(self._success_history_, axis=0)
     
+    def get_average_success_rate(self) -> float:
+        """Returns the average success rate of the agent during the simulation."""
+        return np.mean(self.get_success_history(), axis=0)[0]
+    
     def save_success_history(self, success_history_file_name = "success_history") -> None:
         success_history_file_path = os.path.join(self._simulation_dir_, f"{success_history_file_name}.json")
         with open(success_history_file_path, "w") as success_history_file:
