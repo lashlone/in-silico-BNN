@@ -9,11 +9,13 @@ import os
 
 from datetime import datetime
 from numpy.random import Generator, PCG64
+from numpy.typing import NDArray
 
 from simulation.exceptions import LoadingError
 from simulation.elements.base_element import Element
 
-# Imports needed for eval when loading a simulation
+# Imports needed for eval when loading files
+from numpy import array                                     # noqa: F401
 from simulation.geometry.circle import Circle               # noqa: F401
 from simulation.geometry.rectangle import Rectangle         # noqa: F401
 from simulation.geometry.point import Point                 # noqa: F401
@@ -144,3 +146,12 @@ def load_env_history(env_history_file_path: str) -> list[tuple[str|int|Element|P
     loaded_env_history = eval(loaded_env_history_data)
 
     return loaded_env_history
+
+def load_success_history(success_history_file_path: str) -> list[NDArray]:
+    """Loads a success_history file into a list of arrays"""
+    with open(success_history_file_path, "r") as success_history_file:
+        loaded_success_history_data = json.load(success_history_file)
+
+    loaded_success_history = eval(loaded_success_history_data)
+
+    return loaded_success_history
