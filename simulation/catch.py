@@ -122,7 +122,7 @@ class Catch(Simulation):
         self.agent.set_state(position=self._agent_initial_position)
 
     def regenerate_ball(self) -> None:
-        """Regenerate the ball object at a random position within the simulation ball generation area."""
+        """Regenerate the ball object at its standard position."""
         self.ball.set_state(position=self.ball_initial_position, speed=self._ball_reference_speed)
 
     def resolve_collision_with_agent(self, paddle: Paddle) -> None:

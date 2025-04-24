@@ -16,9 +16,9 @@ import numpy as np
 import os
 from PIL import Image, ImageDraw
 
-def create_frame(svg_width: int, svg_height: int, shapes: list[Shape], positions: list[Point]) -> Image.Image:
+def create_frame(width: int, height: int, shapes: list[Shape], positions: list[Point]) -> Image.Image:
     """Creates a Pillow Image object from a list of shapes and their positions."""
-    img = Image.new("RGB", (svg_width, svg_height), "#000000")
+    img = Image.new("RGB", (width, height), "#000000")
     draw = ImageDraw.Draw(img)
     
     for shape, pos in zip(shapes, positions):            

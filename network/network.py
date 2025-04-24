@@ -8,6 +8,7 @@ Network class module.
 
 from __future__ import annotations
 from typing import Callable
+from numpy.random import Generator
 from numpy.typing import NDArray
 
 from network.exceptions import NetworkCommunicationError, NetworkInitializationError
@@ -143,7 +144,7 @@ class Network():
 
         return free_energy
 
-    def propagate_signal(self, generator: np.random.Generator, sensory_signal: dict[str, list[float]] | None = None) -> None:
+    def propagate_signal(self, generator: Generator, sensory_signal: dict[str, list[float]] | None = None) -> None:
         """This method propagates the signal in the network. If given, the sensory_signal represents the sensory signal perceived by the agent from the environnement in the form of a dictionary."""
         self._state = np.concatenate([region.get_state() for region in self.regions])
 
@@ -208,7 +209,7 @@ class Network():
 
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
-    def reward(self, generator: np.random.Generator) -> None:
+    def reward(self, generator: Generator) -> None:
         for i in range(self.reward_fn_period):
             sensory_signal = dict()
             for region_name in self._sensory_regions_names_:
@@ -220,7 +221,7 @@ class Network():
             self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
             self.optimize_connections()
 
-    def punish(self, generator: np.random.Generator) -> None:
+    def punish(self, generator: Generator) -> None:
         sensory_region_periods = generator.integers(low=self.punish_fn_min_signal_period, high=self.punish_fn_max_signal_period, size=(len(self._sensory_regions_names_),))
         sensory_region_delays = generator.integers(low=0, high=self.punish_fn_period//2, size=(len(self._sensory_regions_names_),))
         for i in range(self.punish_fn_period):
