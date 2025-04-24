@@ -127,7 +127,7 @@ class Network():
         state = self.get_state()
 
         triggered_neurons = np.array(state == 1.0).astype(np.float16)
-        non_triggered_neurons = np.array(state != 1.0).astype(np.float16)
+        non_triggered_neurons = np.array((state == 0.0) | (state == self.recovery_state_energy_ratio)).astype(np.float16)
         probability_matrix = np.nan_to_num(self.get_conformation(), copy=True, nan=1.0)
         resting_probability_vector = np.prod(probability_matrix ** triggered_neurons, axis=1)
         safe_resting_prob_vector = np.where(resting_probability_vector > 0, resting_probability_vector, 1)
@@ -185,6 +185,11 @@ class Network():
                             updated_state.append(1.0)
                         else:
                             updated_state.append(0.0)
+
+                    # Dead neurons stay dead
+                    elif neuron_state == -1.0:
+                        updated_state.append(-1.0)
+
                 region.set_state(updated_state)
         self._state_history_.append(self.get_state())
 
@@ -232,6 +237,20 @@ class Network():
             self.propagate_signal(generator=generator, sensory_signal=sensory_signal)
             self.optimize_connections()
 
+    def remove_neurons(self, number_neurons: int, region_name: str, generator: Generator):
+        """Remove neurones from the desired region. Removes neurons from last to first."""
+        if region_name not in self._region_dict_.keys():
+            raise ValueError(f"unknown region '{region_name}'.")
+        target_region = self._region_dict_[region_name]
+
+        if int(number_neurons) >= target_region.size:
+            raise ValueError(f"Number of neurons to remove exceeds the region's size ({target_region.size}).")
+        
+        target_region_state = target_region.get_state()
+        indices = generator.choice(len(target_region_state), number_neurons, replace=False)
+        target_region_state[indices] = -1.0
+        target_region.set_state(target_region_state.tolist())        
+        
     def set_state(self, state: NDArray[np.float16]) -> None:
         if not isinstance(state, np.ndarray):
             raise TypeError(f"unsupported parameter type(s) for state: '{type(state).__name__}'")

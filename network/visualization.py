@@ -102,7 +102,14 @@ def draw_network(network: Network, layout: list[tuple[float, float]], weight_att
     # Draws neurons on top
     for i, state in enumerate(neuron_states):
         x, y = layout[i]
-        color = get_color(state)
+
+        # Dead neurons are red
+        if state == -1.0:
+            color = "#841B2D"
+        # Other neurons follow a yellow gradient
+        else:
+            color = get_color(state)
+        
         circle = mpatches.Circle((x, y), radius=0.1, color=color, ec='white', lw=1, zorder=3)
         ax.add_patch(circle)
         G.add_node(i, pos=(x, y))
