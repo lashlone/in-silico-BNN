@@ -25,11 +25,15 @@ class MockGenerator(Generator):
     def __init__(self):    
         """Non-stochastic generator for testing purposes."""
 
+    def choice(self, array, choices, replace):
+        return [array - (i+1) for i in range(choices)]
+    
+    def integers(self, low, high, size=None):
+        return np.full(size, (low + high) // 2)
+    
     def uniform(self):
         return 0.4
 
-    def integers(self, low, high, size=None):
-        return np.full(size, (low + high) // 2)
 
 class TestNetwork(unittest.TestCase):
     def setUp(self):
@@ -72,13 +76,13 @@ class TestNetwork(unittest.TestCase):
     def test_optimize_connections(self):
         expected_conformation = np.array([[np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
                                           [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-                                          [0.8, 0.8, np.nan, 0.804, 0.804, 0.804, 0.804, 0.804, 0.804],
+                                          [0.8, 0.8, np.nan, 0.804, 0.79596, 0.804, 0.804, 0.804, 0.804],
                                           [np.nan, np.nan, 0.804, np.nan, 0.79596, 0.804, 0.804, 0.804, 0.804],
                                           [0.8, 0.8, 0.7866501931,  0.804, np.nan, 0.804, 0.804, 0.804, 0.7866501931],
                                           [np.nan, np.nan, 0.804, 0.804, 0.79596, np.nan, 0.804, 0.804, 0.804],
                                           [np.nan, np.nan, 0.804, 0.804, 0.79596, 0.804, np.nan, 0.804, 0.804],
                                           [0.8, 0.8, 0.804, 0.804, 0.79596, 0.804, 0.804, np.nan, 0.804],
-                                          [np.nan, np.nan, 0.804, 0.804, 0.804, 0.804, 0.804, 0.804, np.nan],])
+                                          [np.nan, np.nan, 0.804, 0.804, 0.79596, 0.804, 0.804, 0.804, np.nan],])
         
         self.network.propagate_signal(self.generator)
         self.network.optimize_connections()
@@ -86,6 +90,28 @@ class TestNetwork(unittest.TestCase):
         
         assert_equal(np.round(conformation, 7), np.round(expected_conformation, 7))
 
+    def test_remove_neurons(self):
+        expected_state = np.array([0.5, 0.0, 0.5, 0.0, 1.0, 0.0, 0.0, -1.0, -1.0])
+        expected_conformation = np.array([[np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+                                          [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+                                          [0.8, 0.8, np.nan, 0.804, 0.79596, 0.804, 0.804, 0.804, 0.804],
+                                          [np.nan, np.nan, 0.804, np.nan, 0.79596, 0.804, 0.804, 0.804, 0.804],
+                                          [0.8, 0.8, 0.7866501931,  0.804, np.nan, 0.804, 0.804, 0.804, 0.7866501931],
+                                          [np.nan, np.nan, 0.804, 0.804, 0.79596, np.nan, 0.804, 0.804, 0.804],
+                                          [np.nan, np.nan, 0.804, 0.804, 0.79596, 0.804, np.nan, 0.804, 0.804],
+                                          [0.8, 0.8, 0.804, 0.804, 0.79596, 0.804, 0.804, np.nan, 0.804],
+                                          [np.nan, np.nan, 0.804, 0.804, 0.79596, 0.804, 0.804, 0.804, np.nan],])
+        
+
+        self.network.propagate_signal(self.generator)
+        self.network.remove_neurons(2, "region2", self.generator)
+        self.network.optimize_connections()
+        network_state = self.network.get_state()
+        conformation = self.network.get_conformation()
+
+        assert_equal(network_state, expected_state)
+        assert_equal(np.round(conformation, 7), np.round(expected_conformation, 7))
+        
     def test_get_conformation(self):
         conformation = self.network.get_conformation()
         self.assertIsInstance(conformation, np.ndarray)
