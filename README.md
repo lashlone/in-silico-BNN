@@ -68,4 +68,4 @@ I would like to thank every experts who kindly accepted to discuss with me over 
 * Gena Hahn (graph theory)
 * Jean-François Gauthier (learning algorithms in general)
 
-This project was made using ChatGPT.
+Parts of this project were made using ChatGPT.
