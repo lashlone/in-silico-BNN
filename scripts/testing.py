@@ -67,9 +67,20 @@ if __name__ == "__main__":
     if arguments[1] in ["--batch", "-b"]:
         batch_testing()
 
-    if arguments[1] in ["--coef", "-c"]:
+    elif arguments[1] in ["--coef", "-c"]:
         decay_coefficient = float(arguments[2])
         exploration_rate = float(arguments[3])
         strengthening_rate = float(arguments[4])
         coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate, CONTROLLER_THRESHOLD)
+
+    elif arguments[1] in ["--random", "-r"]:
+        simulation = init_random_pong_simulation(DECAY_COEFFICIENT, EXPLORATION_RATE, STRENGTHENING_RATE, CONTROLLER_THRESHOLD, None, REGION_SIZES)
+
+        for _ in tqdm(range(100), desc="processing simulation"):
+            simulation.step()
+
+        print("generating gif...")
+        generate_gif(simulation, frame_duration=25)
+        
+
     
