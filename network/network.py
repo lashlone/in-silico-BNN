@@ -197,10 +197,9 @@ class Network():
         for neuron_index, neuron_state in enumerate(internal_state):
             if neuron_state == 1.0:
                 for neighbor_index, neighbor_state in enumerate(last_internal_state):
+                    internal_conformation[neighbor_index, neuron_index] = internal_conformation[neighbor_index, neuron_index] * (1 - self.exploration_rate)
                     if neighbor_state == 1.0:
                         internal_conformation[neuron_index, neighbor_index] = internal_conformation[neuron_index, neighbor_index] ** self.strengthening_exponent
-                    else:
-                        internal_conformation[neighbor_index, neuron_index] = internal_conformation[neighbor_index, neuron_index] * (1 - self.exploration_rate)
 
         self._conformation[np.ix_(self._internal_regions_indexes_, self._internal_regions_indexes_)] = internal_conformation
 
