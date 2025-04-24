@@ -27,11 +27,6 @@ DECAY_COEFFICIENT = 0.02
 EXPLORATION_RATE = 0.01
 STRENGTHENING_RATE = 1.1
 
-SENSORY_REGION_SIZE = 1
-AFFERENT_REGION_SIZE = 16
-INTERNAL_REGION_SIZE = 1024
-EFFERENT_REGION_SIZE = 48
-
 SENSORY_TO_AFFERENT_TRANSMISSION_AVERAGE = 0.75
 AFFERENT_TO_AFFERENT_TRANSMISSION_AVERAGE = 0.05
 AFFERENT_TO_EFFERENT_TRANSMISSION_AVERAGE = 0.025
@@ -65,16 +60,20 @@ PONG_PADDLE_CONTROLLER_KP = 1.0
 PONG_PADDLE_CONTROLLER_KI = 0.0
 PONG_PADDLE_CONTROLLER_KD = 0.0
 
-def init_network(decay_coefficient: float, exploration_rate: float, strengthening_rate: float) -> tuple[list[str], list[str], Network]:
+# Catch simulation's default values
+BALL_INITIAL_POSITION = Point(300.0, 160.0)
+BALL_X_SPEED = 2.0
+
+def init_network(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, regions_size: dict[str, int]) -> tuple[list[str], list[str], Network]:
     sensory_region_names = [f's{i}' for i in range(NB_TOPOGRAPHIC_REGIONS)]
     afferent_region_names = [f'a{i}' for i in range(NB_TOPOGRAPHIC_REGIONS)]
     internal_region_names = ['i0',]
     efferent_region_names = ['e0', 'e1',]
 
-    sensory_regions = [ExternalRegion(name=region_name, size=SENSORY_REGION_SIZE) for region_name in sensory_region_names]
-    afferent_regions = [InternalRegion(name=region_name, size=AFFERENT_REGION_SIZE) for region_name in afferent_region_names]
-    efferent_regions = [InternalRegion(name=region_name, size=EFFERENT_REGION_SIZE) for region_name in efferent_region_names]
-    internal_regions = [InternalRegion(name=region_name, size=INTERNAL_REGION_SIZE) for region_name in internal_region_names]   
+    sensory_regions = [ExternalRegion(name=region_name, size=regions_size['sensory']) for region_name in sensory_region_names]
+    afferent_regions = [InternalRegion(name=region_name, size=regions_size['afferent']) for region_name in afferent_region_names]
+    efferent_regions = [InternalRegion(name=region_name, size=regions_size['efferent']) for region_name in efferent_region_names]
+    internal_regions = [InternalRegion(name=region_name, size=regions_size['internal']) for region_name in internal_region_names]
     
     regions = sensory_regions + afferent_regions + internal_regions + efferent_regions
 
@@ -127,8 +126,8 @@ def init_network(decay_coefficient: float, exploration_rate: float, strengthenin
     
     return sensory_region_names, efferent_region_names, network
 
-def init_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str):
-    sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate)
+def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
+    sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
 
     ball_area_center = Point(WIDTH/2.0, HEIGHT/2.0)
     
@@ -153,7 +152,7 @@ def init_pong_simulation(decay_coefficient: float, exploration_rate: float, stre
 
     ball_generation_area = Rectangle(center=ball_area_center, width=WIDTH/4.0, height=3.0*HEIGHT/4.0)
 
-    ball_sensory_signal_translator = PongSignalTranslator(sensory_region_names, SENSORY_REGION_SIZE, SENSORY_SIGNAL_MIN_FREQUENCY, SENSORY_SIGNAL_MAX_FREQUENCY)
+    ball_sensory_signal_translator = PongSignalTranslator(sensory_region_names, regions_size['sensory'], SENSORY_SIGNAL_MIN_FREQUENCY, SENSORY_SIGNAL_MAX_FREQUENCY)
 
     simulation = Pong(
         height=HEIGHT,
@@ -177,7 +176,7 @@ def init_catch_simulation(ball_initial_position: Point, ball_x_speed: float, bal
     ball_speed = Point(0.0, 0.0)
     ball_acceleration = Point(0.0, 0.0)
 
-    ball = Ball(shape=Circle(center=ball_initial_position, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
+    ball = Ball(shape=Circle(center=BALL_INITIAL_POSITION, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
     paddle_width = 15.0
     paddle_height = 60.0
@@ -188,7 +187,7 @@ def init_catch_simulation(ball_initial_position: Point, ball_x_speed: float, bal
     agent_controller = NetworkController(network=network, accessed_regions=tuple(efferent_region_names), reference_speed=AGENT_SPEED, signal_threshold=agent_controller_threshold)
     agent = Paddle(shape=agent_shape, controller=agent_controller, y_range=paddle_y_range)
 
-    ball_sensory_signal_translator = CatchSignalTranslator(sensory_region_names, SENSORY_REGION_SIZE, SENSORY_SIGNAL_MIN_FREQUENCY, SENSORY_SIGNAL_MAX_FREQUENCY)
+    ball_sensory_signal_translator = CatchSignalTranslator(sensory_region_names, regions_size['sensory'], SENSORY_SIGNAL_MIN_FREQUENCY, SENSORY_SIGNAL_MAX_FREQUENCY)
 
     simulation = Catch(
         height=HEIGHT,
@@ -197,8 +196,8 @@ def init_catch_simulation(ball_initial_position: Point, ball_x_speed: float, bal
         ball=ball,
         agent=agent,
         network=network,
-        ball_initial_position=ball_initial_position,
-        ball_reference_x_speed=ball_x_speed,
+        ball_initial_position=BALL_INITIAL_POSITION,
+        ball_reference_x_speed=BALL_X_SPEED,
         ball_reference_speed_orientation=ball_speed_orientation,
         ball_sensory_signal_translator=ball_sensory_signal_translator,
         generator_seed=SIMULATION_GENERATOR_SPEED,

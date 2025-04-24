@@ -12,11 +12,16 @@ from datetime import datetime
 from tqdm import tqdm
 
 from network.visualization import get_standard_layout, draw_network, generate_free_energy_graph
-from scripts.initialization import init_catch_simulation
-from simulation.geometry.point import Point
+from scripts.initialization import init_catch_simulation, init_random_pong_simulation
 from simulation.visualization import generate_gif, generate_success_rate_graph
 
-CONTROLLER_THRESHOLD = 0.4
+
+DECAY_COEFFICIENT = 0.01875
+EXPLORATION_RATE = 0.0003
+STRENGTHENING_RATE = 1.009
+CONTROLLER_THRESHOLD = 0.40
+
+REGION_SIZES = {'afferent': 16, 'efferent': 48, 'internal': 1024, 'sensory': 1}
 
 def batch_testing():
     for i in range(5):
@@ -30,10 +35,8 @@ def coefficient_testing(decay_coefficient, exploration_rate, strengthening_rate,
     
     simulation_name = f"Catch_{decay_coefficient:.04f}_{exploration_rate:.05f}_{strengthening_rate:.04f}_{controller_threshold:.02f}_{datetime.now().strftime('%d-%m-%Y_%Hh%M')}"
 
-    ball_initial_position = Point(300.0, 160.0)
-    ball_x_speed = 2.0
     ball_seed_orientation = 156.2
-    simulation = init_catch_simulation(ball_initial_position, ball_x_speed, ball_seed_orientation, decay_coefficient, exploration_rate, strengthening_rate, controller_threshold, simulation_name)
+    simulation = init_catch_simulation(ball_seed_orientation, decay_coefficient, exploration_rate, strengthening_rate, controller_threshold, simulation_name, REGION_SIZES)
     simulation_dir = simulation.get_simulation_dir()
     
     for _ in tqdm(range(1000), desc="processing simulation"):
