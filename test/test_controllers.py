@@ -7,7 +7,7 @@ from simulation.controllers.network_controller import ConstantSpeedNetworkContro
 from simulation.controllers.pid_controller import VerticalPositionPIDController as VerticalPID
 from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 class MockNetwork(Network):
     """Simplified Network class for testing purposes."""
@@ -34,16 +34,16 @@ class MockNetwork(Network):
 class TestPIDControllers(unittest.TestCase):
     
     def test_vertical_PID_controller(self):
-        reference_element_shape = Circle(center=Point(5.0, 0.0), radius=1.0)
-        reference_element = Element(shape=reference_element_shape, speed=Point(0.0, 1.0))
+        reference_element_shape = Circle(center=Vector2D(5.0, 0.0), radius=1.0)
+        reference_element = Element(shape=reference_element_shape, speed=Vector2D(0.0, 1.0))
 
-        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0)
+        controlled_element_shape = Circle(center=Vector2D(0.0, 2.0), radius=1.0)
         controlled_element = Element(shape=controlled_element_shape)
 
         pid_controller = VerticalPID(kp=0.5, ki=1.0, kd=-0.5, reference=reference_element)
 
-        expected_element_shape = Circle(center=Point(0.0, -1.0), radius=1.0)
-        expected_element = Element(shape=expected_element_shape, speed=Point(0.0, -3.0))
+        expected_element_shape = Circle(center=Vector2D(0.0, -1.0), radius=1.0)
+        expected_element = Element(shape=expected_element_shape, speed=Vector2D(0.0, -3.0))
 
         pid_controller.update(controlled_element)
         controlled_element.update()
@@ -51,8 +51,8 @@ class TestPIDControllers(unittest.TestCase):
 
         reference_element.update()
         
-        expected_element_shape = Circle(center=Point(0.0, -2.0), radius=1.0)
-        expected_element = Element(shape=expected_element_shape, speed=Point(0.0, -1.0))
+        expected_element_shape = Circle(center=Vector2D(0.0, -2.0), radius=1.0)
+        expected_element = Element(shape=expected_element_shape, speed=Vector2D(0.0, -1.0))
 
         pid_controller.update(controlled_element)
         controlled_element.update()
@@ -65,19 +65,19 @@ class TestNetworkController(unittest.TestCase):
     
     def test_constant_speed_network_controller_initialization(self):
         with self.assertRaises(InitializationError):
-            CSNetworkController(network=self.network, accessed_regions=("Unknown", "random"), reference_speed=Point(0.0, 1.0), signal_threshold=0.5)
+            CSNetworkController(network=self.network, accessed_regions=("Unknown", "random"), reference_speed=Vector2D(0.0, 1.0), signal_threshold=0.5)
 
         with self.assertRaises(InitializationError):
-            CSNetworkController(network=self.network, accessed_regions=("foward", "backward", "random"), reference_speed=Point(0.0, 1.0), signal_threshold=0.5)
+            CSNetworkController(network=self.network, accessed_regions=("foward", "backward", "random"), reference_speed=Vector2D(0.0, 1.0), signal_threshold=0.5)
 
     def test_constant_speed_network_controller(self):
-        controlled_element_shape = Circle(center=Point(0.0, 2.0), radius=1.0)
+        controlled_element_shape = Circle(center=Vector2D(0.0, 2.0), radius=1.0)
         controlled_element = Element(shape=controlled_element_shape)
         
-        network_controller = CSNetworkController(network=self.network, accessed_regions=("foward", "backward"), reference_speed=Point(0.0, 1.0), signal_threshold=0.5)
+        network_controller = CSNetworkController(network=self.network, accessed_regions=("foward", "backward"), reference_speed=Vector2D(0.0, 1.0), signal_threshold=0.5)
 
-        possible_positions = [Point(0.0, 2.0), Point(0.0, 3.0), Point(0.0, 4.0)]
-        possible_speed = [Point(0.0, -1.0), Point(0.0, 0.0), Point(0.0, 1.0)]
+        possible_positions = [Vector2D(0.0, 2.0), Vector2D(0.0, 3.0), Vector2D(0.0, 4.0)]
+        possible_speed = [Vector2D(0.0, -1.0), Vector2D(0.0, 0.0), Vector2D(0.0, 1.0)]
         expected_position_cycle = [0, 1, 2, 2, 2, 1, 0]
         expected_speed_cycle = [1, 2, 2, 1, 1, 0, 0]
         

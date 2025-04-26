@@ -9,7 +9,7 @@ from network.network import Network
 from simulation.base_simulation import Simulation
 from simulation.elements.ball import Ball
 from simulation.elements.paddle import Paddle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 import json
 import numpy as np
@@ -22,12 +22,12 @@ class Catch(Simulation):
     ball: Ball
     agent: Paddle
     network: Network
-    ball_initial_position: Point
+    ball_initial_position: Vector2D
     ball_reference_x_speed: float
     ball_reference_speed_orientation: float
     ball_sensory_signal_translator: CatchSignalTranslator
-    _agent_initial_position: Point
-    _ball_reference_speed: Point
+    _agent_initial_position: Vector2D
+    _ball_reference_speed: Vector2D
     _success_history_: list[tuple[bool, int]]
 
     def __init__(
@@ -38,7 +38,7 @@ class Catch(Simulation):
                     ball: Ball,
                     agent: Paddle,
                     network: Network,
-                    ball_initial_position: Point,
+                    ball_initial_position: Vector2D,
                     ball_reference_x_speed: float,
                     ball_reference_speed_orientation: float,
                     ball_sensory_signal_translator: CatchSignalTranslator,
@@ -66,7 +66,7 @@ class Catch(Simulation):
             raise TypeError(f"unsupported parameter type(s) for agent: '{type(agent).__name__}'")
         if not isinstance(network, Network):
             raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
-        if not isinstance(ball_initial_position, Point):
+        if not isinstance(ball_initial_position, Vector2D):
             raise TypeError(f"unsupported parameter type(s) for ball_initial_position: '{type(ball_initial_position).__name__}'")
         if not isinstance(ball_sensory_signal_translator, CatchSignalTranslator):
             raise TypeError(f"unsupported parameter type(s) for ball_sensory_signal_translator: '{type(ball_sensory_signal_translator).__name__}'")
@@ -85,7 +85,7 @@ class Catch(Simulation):
         self.ball_sensory_signal_translator = ball_sensory_signal_translator.set_simulation(self)
 
         self._agent_initial_position = self.agent.get_position()
-        self._ball_reference_speed = Point(-self.ball_reference_x_speed, -self.ball_reference_x_speed * tan(radians(self.ball_reference_speed_orientation)))
+        self._ball_reference_speed = Vector2D(-self.ball_reference_x_speed, -self.ball_reference_x_speed * tan(radians(self.ball_reference_speed_orientation)))
         self._success_history_ = []
 
         self.ball.set_state(position=self.ball_initial_position, speed=self._ball_reference_speed)
@@ -101,7 +101,7 @@ class Catch(Simulation):
         """Check for ball collisions and resolves its effects, either locally or by calling another method."""
         # Detects collisions with top and bottom walls.
         if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.height - self.ball.shape.center.y <= self.ball.shape.radius):
-            reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
+            reflected_speed = self.ball.speed.reflection(Vector2D(0.0, 1.0))
             self.ball.set_state(speed=reflected_speed)
         # Detects collisions with left wall.
         elif self.ball.shape.center.x <= self.ball.shape.radius:
@@ -131,7 +131,7 @@ class Catch(Simulation):
         collided_edge_normal_vector = paddle.shape.get_edge_normal_vector(closest_point).rotate(paddle.shape.orientation)
 
         # Collision with front face
-        if collided_edge_normal_vector == Point(1.0, 0.0):
+        if collided_edge_normal_vector == Vector2D(1.0, 0.0):
             # Rewards the network and record the agent's success           
             self.network.reward(self._generator_)
             self._success_history_.append(np.array([[1.0, self._timer_],]))

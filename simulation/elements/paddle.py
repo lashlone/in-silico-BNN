@@ -7,7 +7,7 @@ from __future__ import annotations
 from simulation.elements.base_element import Element
 from simulation.controllers.base_controller import Controller
 from simulation.geometry.shape import Shape
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 class Paddle(Element):
     """Simple paddle object that moves only on the vertical axis."""
@@ -38,11 +38,11 @@ class Paddle(Element):
         current_y = self.shape.center.y
 
         if current_y < min_y:
-            self.shape.move_center(Point(0.0, min_y - current_y))
-            self.speed = Point(0.0, 0.0)
+            self.shape.move_center(Vector2D(0.0, min_y - current_y))
+            self.speed = Vector2D(0.0, 0.0)
         elif current_y > max_y:
-            self.shape.move_center(Point(0.0, max_y - current_y))
-            self.speed = Point(0.0, 0.0)
+            self.shape.move_center(Vector2D(0.0, max_y - current_y))
+            self.speed = Vector2D(0.0, 0.0)
     
     def set_state(self, position = None, speed = None, acceleration = None) -> Paddle:
         if position is not None:

@@ -7,7 +7,7 @@ from numpy.random import Generator
 from simulation.geometry.circle import Circle
 from simulation.geometry.constants import TOLERANCE
 from simulation.geometry.exceptions import EdgeError
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 from simulation.geometry.shape import Shape
 
 SHAPE_EDGE_COUNT = 4
@@ -16,12 +16,12 @@ class Rectangle(Shape):
     """Creates a rectangular shape based on its center, its width and its height."""
     width: float
     height: float
-    _perimeter_points: list[Point]
-    _edges: list[tuple[Point, Point]]
-    _edge_normal_vectors: list[Point]
-    _edge_reference_vectors: list[Point]
+    _perimeter_points: list[Vector2D]
+    _edges: list[tuple[Vector2D, Vector2D]]
+    _edge_normal_vectors: list[Vector2D]
+    _edge_reference_vectors: list[Vector2D]
 
-    def __init__(self, center: Point, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
+    def __init__(self, center: Vector2D, width: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """Creates a rectangular shape based on its center, its width and its height.
             - center: Point object representing the coordinates of the rectangle's center.
             - width: Floating value representing the size of the rectangle parallel to its local x-axis.
@@ -40,14 +40,14 @@ class Rectangle(Shape):
         self.width = float(width)
         self.height = float(height)
 
-        self._perimeter_points = [Point(self.width/2.0, self.height/2.0), Point(self.width/2.0, -self.height/2.0),
-                                 Point(-self.width/2.0, -self.height/2.0), Point(-self.width/2.0, self.height/2.0)]
+        self._perimeter_points = [Vector2D(self.width/2.0, self.height/2.0), Vector2D(self.width/2.0, -self.height/2.0),
+                                 Vector2D(-self.width/2.0, -self.height/2.0), Vector2D(-self.width/2.0, self.height/2.0)]
 
         self._edges = [(self._perimeter_points[i-1], self._perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
         self._edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector().round(8) for point1, point2 in self._edges]
         self._edge_reference_vectors = [perimeter_point.projection(normal_vector).round(8) for perimeter_point, normal_vector in zip(self._perimeter_points, self._edge_normal_vectors)]
 
-    def contains_point(self, global_point: Point) -> bool:
+    def contains_point(self, global_point: Vector2D) -> bool:
         local_point = self.translate_to_local(global_point)
 
         return (-(self.width/2.0 + TOLERANCE) <= local_point.x <= self.width/2.0 + TOLERANCE 
@@ -71,19 +71,19 @@ class Rectangle(Shape):
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_points(self) -> list[Point]:        
+    def get_perimeter_points(self) -> list[Vector2D]:        
         return [self.translate_to_global(point) for point in self._perimeter_points]
     
-    def get_random_point(self, generator: Generator) -> Point:
+    def get_random_point(self, generator: Generator) -> Vector2D:
         if not isinstance(generator, Generator):
             raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
         
         x = generator.uniform(-self.width/2.0, self.width/2.0)
         y = generator.uniform(-self.height/2.0, self.height/2.0)
 
-        return self.translate_to_global(Point(x, y))
+        return self.translate_to_global(Vector2D(x, y))
     
-    def get_closest_point(self, local_point: Point) -> Point:
+    def get_closest_point(self, local_point: Vector2D) -> Vector2D:
         # Calculates the closest x and y coordinates on the rectangle's perimeter.
         closest_x = max(-self.width / 2.0, min(local_point.x, self.width / 2.0))
         closest_y = max(-self.height / 2.0, min(local_point.y, self.height / 2.0))
@@ -109,9 +109,9 @@ class Rectangle(Shape):
                 # Prioritizes the top edge over the bottom one.
                 closest_y = -self.height / 2.0 if dist_bottom < dist_top else self.height / 2.0
 
-        return Point(closest_x, closest_y)
+        return Vector2D(closest_x, closest_y)
     
-    def get_edge_normal_vector(self, local_point: Point) -> Point:
+    def get_edge_normal_vector(self, local_point: Vector2D) -> Vector2D:
         for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):

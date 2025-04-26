@@ -8,7 +8,7 @@ from network.network import Network
 from simulation.base_simulation import Simulation
 from simulation.elements.ball import Ball
 from simulation.elements.paddle import Paddle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 from simulation.geometry.shape import Shape
 
 import json
@@ -26,7 +26,7 @@ class Pong(Simulation):
     ball_min_orientation: float
     ball_max_orientation: float
     _ball_reference_speed: float
-    _agent_initial_position: Point
+    _agent_initial_position: Vector2D
     _success_history_: list[tuple[bool, int]]
 
     def __init__(
@@ -99,7 +99,7 @@ class Pong(Simulation):
         """Check for ball collisions and resolves its effects, either locally or by calling another method."""
         # Detects collisions with top and bottom walls.
         if (self.ball.shape.center.y <= self.ball.shape.radius) or (self.height - self.ball.shape.center.y <= self.ball.shape.radius):
-            reflected_speed = self.ball.speed.reflection(Point(0.0, 1.0))
+            reflected_speed = self.ball.speed.reflection(Vector2D(0.0, 1.0))
             self.ball.set_state(speed=reflected_speed)
         # Detects collisions with left wall.
         elif self.ball.shape.center.x <= self.ball.shape.radius:
@@ -128,7 +128,7 @@ class Pong(Simulation):
         """Regenerate the ball object at a random position within the simulation ball generation area."""
         ball_position = self.ball_generation_area.get_random_point(self._generator_)
         ball_speed_orientation = self._generator_.uniform(low=self.ball_min_orientation, high=self.ball_max_orientation)
-        ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
+        ball_speed = Vector2D(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
         self.ball.set_state(position=ball_position, speed=ball_speed)
 
     def resolve_collision_with_agent(self, paddle: Paddle):
@@ -139,14 +139,14 @@ class Pong(Simulation):
         speed_adjustment = paddle.speed.projection(collided_edge_normal_vector)
 
         # Collision with front face
-        if collided_edge_normal_vector == Point(1.0, 0.0):
+        if collided_edge_normal_vector == Vector2D(1.0, 0.0):
             # Rewards the network and record the agent's success           
             self.network.reward(self._generator_)
             self._success_history_.append(np.array([[1.0, self._timer_],]))
 
             # Randomizes the orientation of the ball to force the agent to move again.
             ball_speed_orientation = self._generator_.uniform(low=180.0 - self.ball_max_orientation, high=180.0 - self.ball_min_orientation)
-            ball_speed = Point(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
+            ball_speed = Vector2D(self._ball_reference_speed, 0.0).rotate(ball_speed_orientation)
 
         # Collision with other faces
         else:

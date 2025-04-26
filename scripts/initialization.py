@@ -13,7 +13,7 @@ from simulation.controllers.random_controller import LinearRandomWalker as RWCon
 from simulation.elements.ball import Ball
 from simulation.elements.paddle import Paddle
 from simulation.geometry.circle import Circle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 from simulation.geometry.rectangle import Rectangle
 from simulation.pong import Pong, PongSignalTranslator
 
@@ -50,7 +50,7 @@ PAD_X = 20.0
 PAD_Y = 10.0
 BALL_RADIUS = 7.5
 BALL_SPEED_RANGE = (0.0005, 12.0)
-AGENT_SPEED = Point(0.0, 3.0)
+AGENT_SPEED = Vector2D(0.0, 3.0)
 AGENT_CONTROLLER_THRESHOLD = 0.33
 SENSORY_SIGNAL_MIN_FREQUENCY = 30
 SENSORY_SIGNAL_MAX_FREQUENCY = 60
@@ -62,7 +62,7 @@ PONG_PADDLE_CONTROLLER_KI = 0.0
 PONG_PADDLE_CONTROLLER_KD = 0.0
 
 # Catch simulation's default values
-BALL_INITIAL_POSITION = Point(300.0, 160.0)
+BALL_INITIAL_POSITION = Vector2D(300.0, 160.0)
 BALL_X_SPEED = 2.0
 
 def init_network(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, regions_size: dict[str, int]) -> tuple[list[str], list[str], Network]:
@@ -130,23 +130,23 @@ def init_network(decay_coefficient: float, exploration_rate: float, strengthenin
 def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
 
-    ball_area_center = Point(WIDTH/2.0, HEIGHT/2.0)
+    ball_area_center = Vector2D(WIDTH/2.0, HEIGHT/2.0)
     
-    ball_speed = Point(-2.0, 2.0)
-    ball_acceleration = Point(0.0, 0.0)
+    ball_speed = Vector2D(-2.0, 2.0)
+    ball_acceleration = Vector2D(0.0, 0.0)
 
     ball = Ball(shape=Circle(center=ball_area_center, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
     paddle_width = 15.0
     paddle_height = 60.0
-    paddle_shape_center = Point(WIDTH - (PAD_X + paddle_width/2.0), HEIGHT/2.0)
+    paddle_shape_center = Vector2D(WIDTH - (PAD_X + paddle_width/2.0), HEIGHT/2.0)
     paddle_shape = Rectangle(center=paddle_shape_center, width=paddle_width, height=paddle_height, orientation=180.0)
     paddle_controller = PIDController(kp=PONG_PADDLE_CONTROLLER_KP, ki=PONG_PADDLE_CONTROLLER_KI, kd=PONG_PADDLE_CONTROLLER_KD, reference=ball)
     paddle_y_range = (PAD_Y + paddle_height/2.0, HEIGHT - (PAD_Y + paddle_height/2.0))
 
     paddle = Paddle(shape=paddle_shape, controller=paddle_controller, y_range=paddle_y_range)
 
-    agent_shape_center = Point(PAD_X + paddle_width/2.0, HEIGHT/2.0)
+    agent_shape_center = Vector2D(PAD_X + paddle_width/2.0, HEIGHT/2.0)
     agent_shape = Rectangle(center=agent_shape_center, width=paddle_width, height=paddle_height, orientation=0.0)
     agent_controller = NetworkController(network=network, accessed_regions=tuple(efferent_region_names), reference_speed=AGENT_SPEED, signal_threshold=agent_controller_threshold)
     agent = Paddle(shape=agent_shape, controller=agent_controller, y_range=paddle_y_range)
@@ -174,23 +174,23 @@ def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, 
 def init_random_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
 
-    ball_area_center = Point(WIDTH/2.0, HEIGHT/2.0)
+    ball_area_center = Vector2D(WIDTH/2.0, HEIGHT/2.0)
     
-    ball_speed = Point(-2.0, 2.0)
-    ball_acceleration = Point(0.0, 0.0)
+    ball_speed = Vector2D(-2.0, 2.0)
+    ball_acceleration = Vector2D(0.0, 0.0)
 
     ball = Ball(shape=Circle(center=ball_area_center, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
     paddle_width = 15.0
     paddle_height = 60.0
-    paddle_shape_center = Point(WIDTH - (PAD_X + paddle_width/2.0), HEIGHT/2.0)
+    paddle_shape_center = Vector2D(WIDTH - (PAD_X + paddle_width/2.0), HEIGHT/2.0)
     paddle_shape = Rectangle(center=paddle_shape_center, width=paddle_width, height=paddle_height, orientation=180.0)
     paddle_controller = RWController(reference_speed=AGENT_SPEED)
     paddle_y_range = (PAD_Y + paddle_height/2.0, HEIGHT - (PAD_Y + paddle_height/2.0))
 
     paddle = Paddle(shape=paddle_shape, controller=paddle_controller, y_range=paddle_y_range)
 
-    agent_shape_center = Point(PAD_X + paddle_width/2.0, HEIGHT/2.0)
+    agent_shape_center = Vector2D(PAD_X + paddle_width/2.0, HEIGHT/2.0)
     agent_shape = Rectangle(center=agent_shape_center, width=paddle_width, height=paddle_height, orientation=0.0)
     agent_controller = NetworkController(network=network, accessed_regions=tuple(efferent_region_names), reference_speed=AGENT_SPEED, signal_threshold=agent_controller_threshold)
     agent = Paddle(shape=agent_shape, controller=agent_controller, y_range=paddle_y_range)
@@ -220,8 +220,8 @@ def init_random_pong_simulation(decay_coefficient: float, exploration_rate: floa
 def init_catch_simulation(ball_speed_orientation: float, decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
     
-    ball_speed = Point(0.0, 0.0)
-    ball_acceleration = Point(0.0, 0.0)
+    ball_speed = Vector2D(0.0, 0.0)
+    ball_acceleration = Vector2D(0.0, 0.0)
 
     ball = Ball(shape=Circle(center=BALL_INITIAL_POSITION, radius=BALL_RADIUS), speed=ball_speed, speed_range=BALL_SPEED_RANGE, acceleration=ball_acceleration)
 
@@ -229,7 +229,7 @@ def init_catch_simulation(ball_speed_orientation: float, decay_coefficient: floa
     paddle_height = 60.0
     paddle_y_range = (PAD_Y + paddle_height/2.0, HEIGHT - (PAD_Y + paddle_height/2.0))
 
-    agent_shape_center = Point(PAD_X + paddle_width/2.0, HEIGHT/2.0)
+    agent_shape_center = Vector2D(PAD_X + paddle_width/2.0, HEIGHT/2.0)
     agent_shape = Rectangle(center=agent_shape_center, width=paddle_width, height=paddle_height, orientation=0.0)
     agent_controller = NetworkController(network=network, accessed_regions=tuple(efferent_region_names), reference_speed=AGENT_SPEED, signal_threshold=agent_controller_threshold)
     agent = Paddle(shape=agent_shape, controller=agent_controller, y_range=paddle_y_range)

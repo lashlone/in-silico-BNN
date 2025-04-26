@@ -18,7 +18,7 @@ from simulation.elements.base_element import Element
 from numpy import array                                     # noqa: F401
 from simulation.geometry.circle import Circle               # noqa: F401
 from simulation.geometry.rectangle import Rectangle         # noqa: F401
-from simulation.geometry.point import Point                 # noqa: F401
+from simulation.geometry.vector import Vector2D                 # noqa: F401
 from simulation.geometry.triangle import IsoscelesTriangle  # noqa: F401
 
 RESULT_PATH_DIR = os.path.join("results")
@@ -33,7 +33,7 @@ class Simulation():
     _elements: list[Element]
     _simulation_dir_: str
     _generator_: Generator
-    _env_history_: list[tuple[str | int | Element | Point]]
+    _env_history_: list[tuple[str | int | Element | Vector2D]]
     _timer_: int
     
     def __init__(self, height: int, width: int, frequency: int, elements: list[Element], simulation_name: str | None = None, generator_seed: int | None = None):
@@ -108,7 +108,7 @@ class Simulation():
         with open(env_history_file_path, "w") as env_history_file:
             json.dump(repr(self._env_history_), env_history_file)
 
-    def get_env_history(self) -> list[tuple[str | int | Element | Point]]:
+    def get_env_history(self) -> list[tuple[str | int | Element | Vector2D]]:
         return self._env_history_.copy()
     
     def get_simulation_dir(self) -> str:
@@ -138,7 +138,7 @@ def load_simulation(simulation_name: str) -> Simulation:
         raise LoadingError(f"saved simulation's name ({loaded_simulation.simulation_name}) does not match its repository name ({simulation_name})")
     return loaded_simulation
         
-def load_env_history(env_history_file_path: str) -> list[tuple[str|int|Element|Point]]:
+def load_env_history(env_history_file_path: str) -> list[tuple[str|int|Element|Vector2D]]:
     """Loads a env_history file into a tuple."""
     with open(env_history_file_path, "r") as env_history_file:
         loaded_env_history_data = json.load(env_history_file)

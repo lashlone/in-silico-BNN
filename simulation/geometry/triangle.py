@@ -9,7 +9,7 @@ from simulation.geometry.circle import Circle
 from simulation.geometry.constants import TOLERANCE
 from simulation.geometry.exceptions import EdgeError
 from simulation.geometry.shape import Shape
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 SHAPE_EDGE_COUNT = 3
 
@@ -17,12 +17,12 @@ class IsoscelesTriangle(Shape):
     """Creates a isosceles triangular shape based on its center, its base and its height."""
     base: float
     height: float
-    _perimeter_points: list[Point]
-    _edges: list[tuple[Point, Point]]
-    _edge_normal_vectors: list[Point]
-    _edge_reference_vectors: list[Point]
+    _perimeter_points: list[Vector2D]
+    _edges: list[tuple[Vector2D, Vector2D]]
+    _edge_normal_vectors: list[Vector2D]
+    _edge_reference_vectors: list[Vector2D]
 
-    def __init__(self, center: Point, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
+    def __init__(self, center: Vector2D, base: float, height: float, orientation: float = 0.0, fill: str = "#FFFFFF", outline: str = "#FFFFFF"):
         """Creates isosceles triangular shape based on its center, its base and its height.
             - center: Point object representing the center's coordinates of the rectangle boxing the triangle.
             - base: Floating value representing the size of the isosceles triangle's base, parallel to its local y-axis.
@@ -41,15 +41,15 @@ class IsoscelesTriangle(Shape):
         self.base = float(base)
         self.height = float(height)
         
-        self._perimeter_points = [Point(self.height/2.0, 0.0),
-                                  Point(-self.height/2.0, -self.base/2.0),
-                                  Point(-self.height/2.0, self.base/2.0)]
+        self._perimeter_points = [Vector2D(self.height/2.0, 0.0),
+                                  Vector2D(-self.height/2.0, -self.base/2.0),
+                                  Vector2D(-self.height/2.0, self.base/2.0)]
         
         self._edges = [(self._perimeter_points[i-1], self._perimeter_points[i]) for i in range(SHAPE_EDGE_COUNT)]
         self._edge_normal_vectors = [(point2 - point1).rotate(90.0).unit_vector() for point1, point2 in self._edges]
         self._edge_reference_vectors = [perimeter_point.projection(normal_vector) for perimeter_point, normal_vector in zip(self._perimeter_points, self._edge_normal_vectors)]
 
-    def get_barycentric_coordinates(self, local_point: Point) -> list[float]:
+    def get_barycentric_coordinates(self, local_point: Vector2D) -> list[float]:
         """Returns the barycentric coordinates of the given point, using the triangle's three vertices as base."""
         v0, v1, v2 = self._perimeter_points
 
@@ -69,7 +69,7 @@ class IsoscelesTriangle(Shape):
 
         return lambda0, lambda1, lambda2
     
-    def contains_point(self, global_point: Point) -> bool:
+    def contains_point(self, global_point: Vector2D) -> bool:
         local_point = self.translate_to_local(global_point)
         local_barycentric_point = self.get_barycentric_coordinates(local_point)
 
@@ -93,10 +93,10 @@ class IsoscelesTriangle(Shape):
         else:
             raise TypeError(f"unsupported parameter type(s) for shape: '{type(shape).__name__}'")
         
-    def get_perimeter_points(self) -> list[Point]:
+    def get_perimeter_points(self) -> list[Vector2D]:
         return [self.translate_to_global(point) for point in self._perimeter_points]
     
-    def get_random_point(self, generator: Generator) -> Point:
+    def get_random_point(self, generator: Generator) -> Vector2D:
         if not isinstance(generator, Generator):
             raise TypeError(f"unsupported parameter type(s) for generator: '{type(generator).__name__}'")
         
@@ -108,10 +108,10 @@ class IsoscelesTriangle(Shape):
         
         return self.translate_to_global(lambdas[0]*v0 + lambdas[1]*v1 + lambdas[2]*v2)
 
-    def get_closest_point(self, local_point: Point) -> Point:
+    def get_closest_point(self, local_point: Vector2D) -> Vector2D:
         # Computes the offset between the used triangle center and its incentre.
         bisected_angle_rad = atan(2.0*self.height/self.base)/2.0
-        offset = Point((self.height - self.base*tan(bisected_angle_rad))/2.0, 0.0)
+        offset = Vector2D((self.height - self.base*tan(bisected_angle_rad))/2.0, 0.0)
 
         # Checks the orientation of the circle's center compared to the triangle's incentre.
         center_orientation = (local_point + offset).orientation()
@@ -137,7 +137,7 @@ class IsoscelesTriangle(Shape):
 
         return closest_point
     
-    def get_edge_normal_vector(self, local_point) -> Point:
+    def get_edge_normal_vector(self, local_point) -> Vector2D:
         for edge, normal_vector, reference_vector in zip(self._edges, self._edge_normal_vectors, self._edge_reference_vectors):
             if (min(edge[0].x, edge[1].x) - TOLERANCE <= local_point.x <= max(edge[0].x, edge[1].x) + TOLERANCE
             and min(edge[0].y, edge[1].y) - TOLERANCE <= local_point.y <= max(edge[0].y, edge[1].y) + TOLERANCE):

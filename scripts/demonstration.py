@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from network.visualization import get_standard_layout, draw_network
 from scripts.initialization import init_catch_simulation
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 from simulation.visualization import generate_gif
 
 DECAY_COEFFICIENT = 0.05
@@ -22,7 +22,7 @@ CONTROLLER_THRESHOLD = 0.40
 
 REGIONS_SIZE = {'afferent': 4, 'efferent': 12, 'internal': 64, 'sensory': 1}
 
-BALL_ACCELERATION = Point(0.0, 0.01)
+BALL_ACCELERATION = Vector2D(0.0, 0.01)
 
 if __name__ == '__main__':
     while True:

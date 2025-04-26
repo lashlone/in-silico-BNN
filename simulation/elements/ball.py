@@ -6,14 +6,14 @@ from __future__ import annotations
 
 from simulation.elements.base_element import Element
 from simulation.geometry.circle import Circle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 class Ball(Element):
     """Simple ball object that follows an UARM and processes collisions."""
     shape: Circle
     speed_range: tuple[float, float]
     
-    def __init__(self, shape: Circle, speed: Point, speed_range: tuple[float, float], acceleration: Point):
+    def __init__(self, shape: Circle, speed: Vector2D, speed_range: tuple[float, float], acceleration: Vector2D):
         """Creates a simple ball object that follows the UARM and processes collisions. This element only allows for circular shapes. 
         A speed range tuple, ('min', 'max'), should be specified to avoid it from potentially breaking the simulation.
             - shape: Circle object representing the shape of the ball.

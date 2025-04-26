@@ -4,7 +4,7 @@ Simulation visualization module. This module contains functions to visualize the
 
 from simulation.catch import Catch
 from simulation.geometry.circle import Circle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 from simulation.geometry.rectangle import Rectangle
 from simulation.geometry.shape import Shape
 from simulation.geometry.triangle import IsoscelesTriangle
@@ -16,7 +16,7 @@ import numpy as np
 import os
 from PIL import Image, ImageDraw
 
-def create_frame(width: int, height: int, shapes: list[Shape], positions: list[Point]) -> Image.Image:
+def create_frame(width: int, height: int, shapes: list[Shape], positions: list[Vector2D]) -> Image.Image:
     """Creates a Pillow Image object from a list of shapes and their positions."""
     img = Image.new("RGB", (width, height), "#000000")
     draw = ImageDraw.Draw(img)

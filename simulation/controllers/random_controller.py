@@ -6,7 +6,7 @@ from simulation.controllers.base_controller import Controller
 from simulation.controllers.exceptions import ControllerInitializationError
 from simulation.elements.base_element import Element
 from simulation.elements.paddle import Paddle
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 from numpy.random import Generator
 
@@ -33,15 +33,15 @@ class RandomController(Controller):
     
 class LinearRandomWalker(RandomController):
     """Controls the element's vertical position based on a linear random walker model."""
-    reference_speed: Point
+    reference_speed: Vector2D
     reference_probabilities: list[float]
     _random_walker_movements_: list[int] = [1, 0, -1]
 
-    def __init__(self, reference_speed: Point, reference_probabilities: list[float] = [1.0/3.0, 1.0/3.0, 1.0/3.0]):
+    def __init__(self, reference_speed: Vector2D, reference_probabilities: list[float] = [1.0/3.0, 1.0/3.0, 1.0/3.0]):
         """RandomController that controls the element's vertical position based on a linear random walker model.
             - reference_speed : Point object representing the random walker step.
             - reference_probability (optional): List of floating values representing the probability that the random walker moves up, stands still or moves down respectively."""
-        if not isinstance(reference_speed, Point):            
+        if not isinstance(reference_speed, Vector2D):            
             raise TypeError(f"unsupported parameter type(s) for reference_speed: '{type(reference_speed).__name__}'")
         if not isinstance(reference_probabilities, list):
             raise TypeError(f"unsupported parameter type(s) for reference_probabilities: '{type(reference_probabilities).__name__}'")

@@ -7,7 +7,7 @@ from network.network import Network
 from simulation.controllers.base_controller import Controller
 from simulation.controllers.exceptions import ControllerInitializationError as InitializationError
 from simulation.elements.base_element import Element
-from simulation.geometry.point import Point
+from simulation.geometry.vector import Vector2D
 
 class NetworkController(Controller):
     """Base class for NetworkController objects."""
@@ -33,10 +33,10 @@ class NetworkController(Controller):
 
 class ConstantSpeedNetworkController(NetworkController):
     """Moves the element vertically by a fixed speed based on the average firing in the motor regions."""
-    reference_speed: Point
+    reference_speed: Vector2D
     signal_threshold: float
 
-    def __init__(self, network: Network, accessed_regions: tuple[str], reference_speed: Point, signal_threshold: float):
+    def __init__(self, network: Network, accessed_regions: tuple[str], reference_speed: Vector2D, signal_threshold: float):
         """NetworkController that moves the element vertically by a fixed speed based on the average firing in the motor region.
             - network: Network object representing the referenced network.
             - accessed_regions : Tuple of strings representing the two accessed motor regions from the network. The first region is for forward motion while the second is for backward motion.
@@ -47,7 +47,7 @@ class ConstantSpeedNetworkController(NetworkController):
         
         if not len(accessed_regions) == 2:
             raise InitializationError(f"Expected to access 2 motor regions and got {len(accessed_regions)} instead.")
-        if not isinstance(reference_speed, Point):
+        if not isinstance(reference_speed, Vector2D):
             raise TypeError(f"unsupported parameter type(s) for reference_speed: '{type(reference_speed).__name__}'")
         
         self.reference_speed = reference_speed
@@ -60,7 +60,7 @@ class ConstantSpeedNetworkController(NetworkController):
         forward_signal, backward_signal = self.network.get_motor_signal(self.accessed_regions)
 
         # Moves the element based on the given threshold
-        controlled_element_speed = Point(0.0, 0.0)
+        controlled_element_speed = Vector2D(0.0, 0.0)
         if forward_signal >= self.signal_threshold:
             controlled_element_speed += self.reference_speed
         if backward_signal >= self.signal_threshold:
