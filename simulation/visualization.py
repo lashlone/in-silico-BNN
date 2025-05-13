@@ -81,7 +81,7 @@ def generate_success_rate_graph(simulation: Pong | Catch, target_success_rate: f
     fig.savefig(os.path.join(simulation.get_simulation_dir(), f"{file_name}.png"))
     plt.close(fig)
     
-def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: str, target_success_rate: float | None = None, file_name: str = "success_rate_evolution", mean_filter_width: int = 8, interpolation_fragment_size: int = 250):
+def generate_avg_success_rate_graph(simulations: list[Catch], validation_dir: str, target_success_rate: float | None = None, file_name: str = "success_rate_evolution", mean_filter_width: int = 10, interpolation_fragment_size: int = 250):
     """Generates a graph of aggregated success rate evolution for multiple Catch simulations."""
     if not all(isinstance(sim, Catch) for sim in simulations):
         raise TypeError("unsupported element type(s) for simulations")

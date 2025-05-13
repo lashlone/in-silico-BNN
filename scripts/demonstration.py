@@ -1,5 +1,5 @@
 """
-
+This script was used during the poster presentation to demonstrate how the network functions.
 """
 
 import matplotlib

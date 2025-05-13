@@ -1,13 +1,12 @@
 from network.network import Network
 
-from matplotlib import patches as mpatches
-from matplotlib.figure import Figure
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import os
 
+from matplotlib import patches as mpatches
+from matplotlib.figure import Figure
 
 def get_color(value: float) -> tuple[float, float, float]:
     """Returns a color interpolated between black (#000000) and yellow (#FFFF00)"""
@@ -62,7 +61,7 @@ def draw_network(network: Network, layout: list[tuple[float, float]], weight_att
     """Draws a neural network's representation based on a structured layout.
         - network: Network object used to draw.
         - layout: list of tuples representing the positions for the network's neurons in the generated graph.
-        - weight_attenuation (optional): Float value representing the coefficient used to show only the main connections."""
+        - weight_attenuation (optional): Float value representing the coefficient used to attenuate the connections' opacity."""
     
     if not isinstance(network, Network):
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")
@@ -120,7 +119,7 @@ def draw_network(network: Network, layout: list[tuple[float, float]], weight_att
 
     return fig
 
-def generate_free_energy_graph(network: Network, simulation_dir: str, file_name: str = "free_energy_evolution"):
+def generate_free_energy_graph(network: Network, simulation_dir: str, file_name: str = "free_energy_evolution") -> None:
     """Generates the graph of the network's free energy evolution."""
     if not isinstance(network, Network):
         raise TypeError(f"unsupported parameter type(s) for network: '{type(network).__name__}'")

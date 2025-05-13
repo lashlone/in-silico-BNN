@@ -18,7 +18,7 @@ from simulation.elements.base_element import Element
 from numpy import array                                     # noqa: F401
 from simulation.geometry.circle import Circle               # noqa: F401
 from simulation.geometry.rectangle import Rectangle         # noqa: F401
-from simulation.geometry.vector import Vector2D                 # noqa: F401
+from simulation.geometry.vector import Vector2D             # noqa: F401
 from simulation.geometry.triangle import IsoscelesTriangle  # noqa: F401
 
 RESULT_PATH_DIR = os.path.join("results")

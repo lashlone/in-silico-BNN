@@ -6,10 +6,11 @@
 Base classes module. 
 """
 
+from numpy.typing import NDArray
+
 from network.exceptions import NetworkCommunicationError
 
 import numpy as np
-from numpy.typing import NDArray
 
 class Region:
     """Base Class for all region objects."""
@@ -58,6 +59,7 @@ class Region:
             return enumerate(np.copy(self._state))
         
     def is_internal(self) -> bool:
+        """Checks if the region is internal."""
         return isinstance(self, InternalRegion)
     
 class InternalRegion(Region):

@@ -1,5 +1,5 @@
 """
-This module defines functions to initialize the network, the catch simulation and the pong simulation.
+This module defines functions to initialize the network, the catch simulation and the pong simulation, used in other scripts.
 """
 
 from network.graph_generation import fixed_average_transmission, self_referring_fixed_average_transmission
@@ -66,11 +66,16 @@ BALL_INITIAL_POSITION = Vector2D(300.0, 160.0)
 BALL_X_SPEED = 2.0
 
 def init_network(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, regions_size: dict[str, int]) -> tuple[list[str], list[str], Network]:
+    """
+    This function initializes a simple network object based on the given parameters. It returns the name of the sensory regions, efferent regions and the network object itself.
+    """
+    # Defines the regions' name
     sensory_region_names = [f's{i}' for i in range(NB_TOPOGRAPHIC_REGIONS)]
     afferent_region_names = [f'a{i}' for i in range(NB_TOPOGRAPHIC_REGIONS)]
     internal_region_names = ['i0',]
     efferent_region_names = ['e0', 'e1',]
 
+    # Initializes the regions based on the given sizes
     sensory_regions = [ExternalRegion(name=region_name, size=regions_size['sensory']) for region_name in sensory_region_names]
     afferent_regions = [InternalRegion(name=region_name, size=regions_size['afferent']) for region_name in afferent_region_names]
     efferent_regions = [InternalRegion(name=region_name, size=regions_size['efferent']) for region_name in efferent_region_names]
@@ -127,7 +132,10 @@ def init_network(decay_coefficient: float, exploration_rate: float, strengthenin
     
     return sensory_region_names, efferent_region_names, network
 
-def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
+def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]) -> Pong:
+    """
+    This function initializes a Pong simulation where the opposing paddle is controlled by a PID controller.
+    """
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
 
     ball_area_center = Vector2D(WIDTH/2.0, HEIGHT/2.0)
@@ -171,7 +179,10 @@ def init_PID_pong_simulation(decay_coefficient: float, exploration_rate: float, 
 
     return simulation
 
-def init_random_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
+def init_random_pong_simulation(decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]) -> Pong:
+    """
+    This function initializes a Pong simulation where the opposing paddle is controlled by a random walker controller.
+    """
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
 
     ball_area_center = Vector2D(WIDTH/2.0, HEIGHT/2.0)
@@ -217,7 +228,10 @@ def init_random_pong_simulation(decay_coefficient: float, exploration_rate: floa
     
     return simulation
 
-def init_catch_simulation(ball_speed_orientation: float, decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]):
+def init_catch_simulation(ball_speed_orientation: float, decay_coefficient: float, exploration_rate: float, strengthening_rate: float, agent_controller_threshold: float, simulation_name: str, regions_size: dict[str, int]) -> Catch:
+    """
+    This function initializes a Catch simulation based on the given parameters.
+    """
     sensory_region_names, efferent_region_names, network = init_network(decay_coefficient, exploration_rate, strengthening_rate, regions_size)
     
     ball_speed = Vector2D(0.0, 0.0)
