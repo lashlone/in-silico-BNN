@@ -11,7 +11,7 @@ from datetime import datetime
 from tqdm import tqdm
 
 from network.visualization import get_standard_layout, draw_network
-from scripts.initialization import init_catch_simulation
+from examples.initialization import init_catch_simulation
 from simulation.geometry.vector import Vector2D
 from simulation.visualization import generate_gif
 

@@ -12,7 +12,7 @@ from datetime import datetime
 from tqdm import tqdm
 
 from network.visualization import generate_free_energy_graph
-from scripts.initialization import init_catch_simulation
+from examples.initialization import init_catch_simulation
 from simulation.visualization import generate_gif, generate_success_rate_graph, generate_avg_success_rate_graph
 
 NUMBER_SIMULATIONS = 8

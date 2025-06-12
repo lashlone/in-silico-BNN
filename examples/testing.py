@@ -12,7 +12,7 @@ from datetime import datetime
 from tqdm import tqdm
 
 from network.visualization import get_standard_layout, draw_network, generate_free_energy_graph
-from scripts.initialization import init_catch_simulation, init_random_pong_simulation
+from examples.initialization import init_catch_simulation, init_random_pong_simulation
 from simulation.visualization import generate_gif, generate_success_rate_graph
 
 
